@@ -12,4 +12,6 @@ token_t *token_create(TOK_TYPE token_type_, const char *start_ptr, int lex_lengt
 void token_free(token_t *token);
 void token_print(token_t *token);
 
+int dka(const char *source, token_t *tokens);
+
 #endif
