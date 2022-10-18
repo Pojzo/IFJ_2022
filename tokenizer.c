@@ -7,6 +7,8 @@ const char whitespace = ' ';
 
 typedef enum {STATE_START, STATE_ID_START, STATE_ID_MAIN, STATE_ID} state;
 
+static token_t *tokens;
+
 // constructor for struct Token
 token_t *token_create(TOK_TYPE token_type_, const char *start_ptr, int lex_length) {
     token_t *token = malloc(sizeof(token_t));
@@ -43,7 +45,23 @@ void token_print(token_t *token) {
 
 // deterministic finite automata
 // returns 1 if there was an error during tokenization
-int dka(const char *source, token_t *tokens) {
+int dka(char *source, token_t *tokens) {
+    // we'll iterate through all the characters in source
+    // each function will return a state
+    // the returned state will determine the next function to be called
+    state current_state = STATE_START;
+    while (source != NULL) {
+        switch (current_state) {
+            case STATE_START:
+                // current_state = tunkcia volaka
+                // break
+            case STATE_ID_START:
+            case STATE_ID_MAIN:
+            case STATE_ID:
+                // pridam tam token
+        }
+        source += 1;
+    }
     return 0;
 }
 
