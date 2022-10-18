@@ -1,13 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 #include "tokenizer.h"
 
 int main() {
-    char *buffer = "abcdefghij";
-    token_t *token = token_create(TOK_ID, buffer, 3);
-    token_print(token);
-
-    token_t *token2 = token_create(TOK_KEYWORD, buffer + sizeof(char) * 2, 3);
-    token_print(token2);
-
+    char *buffer = "gazdik";
+    int buffer_len = strlen(buffer);
+    token_t *tokens = NULL;
+    dka(buffer, buffer_len, tokens);
     return 0;
 }
