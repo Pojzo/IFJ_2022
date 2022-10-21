@@ -18,10 +18,11 @@ token_t *token_create(tok_type token_type_, const char *start_ptr, int lex_lengt
     token->token_type = token_type_;
 
     // create memory for lexeme
-    token->value = malloc(lex_length * sizeof(char)); 
+    token->value = malloc((lex_length + 1) * sizeof(char)); 
     for (int i = 0; i < lex_length; i++) {
-        token->value[i] = start_ptr[i];     
+        token->value[i] = (char)start_ptr[i];     
     }
+    token->value[lex_length] = '\0';
 
     return token;
 }
@@ -45,13 +46,6 @@ void token_print(token_t *token) {
 // returns 1 if there was an error during tokenization
 int dka(char *source, int source_len, token_t *tokens) {
     (void) tokens;
-    /*
-    const char *test = "12345";
-    token_t *token1 = token_create(TOK_ID, test, 1);
-    token_t *token2 = token_create(TOK_KEYWORD, test, 2);
-    token_t *token3 = token_create(TOK_SEPARATOR, test, 3);
-    token_t *token4 = token_create(TOK_LITERAL, test, 4);
-    */
     // we'll iterate through all the characters in source
     // each function will return a state
     // the returned state will determine the next function to be called
@@ -108,7 +102,7 @@ token_array_t *token_array_create() {
         return NULL;
     }
 
-    token_array->tokens = malloc(0);
+    token_array->tokens = NULL;
 
     // num tokens represents the number of tokens currently present in the array
     token_array->num_tokens = 0;
@@ -122,10 +116,11 @@ token_array_t *token_array_create() {
 // ADDED
 void token_array_free(token_array_t *token_array) {
     // iterate over tokens and free each one of them
-    for (int i = 0; i < token_array->array_len; i++) {
+    for (int i = 0; i < token_array->num_tokens; i++) {
         token_free(token_array->tokens[i]);
         token_array->tokens[i] = NULL;
     }
+    free(token_array->tokens);
     free(token_array);
 }
 
@@ -141,7 +136,8 @@ void token_array_add(token_array_t *token_array, tok_type token_type, char *star
     // if num_tokens == array_len - if number of tokens is equal to the number of allocated space, we should inflate the
     // array
     
-    if (token_array->num_tokens == token_array->array_len) {
+    if (token_array->num_tokens + 1 == token_array->array_len) {
+        // increase the size by 2 to avoid too many reallocs
         token_array->array_len *= 2;
         token_array->tokens = realloc(token_array->tokens, sizeof(token_t) * token_array->array_len);
     }

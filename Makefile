@@ -9,3 +9,6 @@ main: main.o bst.o
 
 bst.o: bst.c
 	$(CC) $(FLAGS) -c bst.c
+
+tokenizer: tokenizer_test.c tokenizer.c tokenizer.h
+	$(CC) $(FLAGS) tokenizer_test.c tokenizer.c tokenizer.h -o tokenizer
