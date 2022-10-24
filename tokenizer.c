@@ -4,7 +4,9 @@
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
-
+const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
+const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
+const char separ[] = {' ', '(', ')', '{', '}', '[', ']', ';', '.', ',', '\n', '\r'};
 token_t *tokens;
 
 // constructor for struct Token
@@ -40,54 +42,6 @@ void token_print(token_t *token) {
         return;
     }
     printf("Token->type: %s\nToken->value: %s\n", TOK_STR[token->token_type], token->value);
-}
-
-// deterministic finite automata
-// returns 1 if there was an error during tokenization
-int dka(char *source, int source_len, token_t *tokens) {
-    (void) tokens;
-    // we'll iterate through all the characters in source
-    // each function will return a state
-    // the returned state will determine the next function to be called
-    state current_state = STATE_START;
-    char *start_ptr = source;
-    int token_value_len = 0;
-    for (int i = 0; i < source_len; i++) {
-        switch (current_state) {
-            case STATE_START:
-                current_state = function_start(*(start_ptr + token_value_len));
-                token_value_len++;
-                (void) token_value_len;
-                return 0;
-            case STATE_ID:
-                // token_t *new_token = token_create(TOK_ID, start_ptr, token_value_len);
-                start_ptr += token_value_len;
-                // (void) new_token;
-                (void) start_ptr;
-                return 0;
-            default:
-                return 0;
-
-                // pridam tam token
-        }
-        source += 1;
-    }
-    return 0;
-}
-
-// typedef enum {STATE_START, STATE_ID_START, STATE_ID_MAIN, STATE_ID} state;
-
-state function_start(char c){
-    if (c == whitespace){
-        printf("Tentok more gadzo je whitespace\n");
-        return STATE_START; 
-    }
-    else if (c == '$'){
-        printf("Tentok more gadzo je $\n");
-        return STATE_ID_START;
-    }
-    printf("Je to volaco ine\n");
-    return STATE_ERROR;
 }
 
 // ADDED
@@ -143,4 +97,75 @@ void token_array_add(token_array_t *token_array, tok_type token_type, char *star
     }
     // add the newly created token to our array
     token_array->tokens[token_array->num_tokens++] = token;
+}
+
+
+
+// deterministic finite automata
+// returns 1 if there was an error during tokenization
+int dka(char *source, int source_len, token_t *tokens) {
+    (void) tokens;
+    // we'll iterate through all the characters in source
+    // each function will return a state
+    // the returned state will determine the next function to be called
+    state current_state = STATE_START;
+    char *start_ptr = source;
+    int token_value_len = 0;
+    for (int i = 0; i < source_len; i++) {
+        switch (current_state) {
+            case STATE_START:
+                current_state = state_start(*(start_ptr + token_value_len));
+                token_value_len++;
+                (void) token_value_len;
+                return 0;
+            case STATE_ID:
+                // token_t *new_token = token_create(TOK_ID, start_ptr, token_value_len);
+                current_state = state_id_start(*(start_ptr + token_value_len));
+                start_ptr += token_value_len;
+                // (void) new_token;
+                (void) start_ptr;
+                return 0;
+            default:
+                return 0;
+
+                // pridam tam token
+        }
+        source += 1;
+    }
+    return 0;
+}
+
+
+// start state
+state state_start(char c){
+    if (c == whitespace){
+        printf("Tentok more gadzo je whitespace\n");
+        return STATE_START; 
+    }
+    else if (c == '$'){
+        printf("Tentok more gadzo je $\n");
+        return STATE_ID_START;
+    }
+    printf("Je to volaco ine\n");
+    return STATE_ERROR;
+}
+
+// identifier states
+state state_id_start(char c) {
+    // POBO (TODO)
+    (void) c;
+    return STATE_ID;
+}
+
+state state_id_main(char c) {
+    // POBO (TODO)
+    (void) c;
+    return STATE_ID;
+}
+
+// keyword states
+state state_keyword_start(char c) {
+    // POBO (TODO)
+    (void) c;
+    return STATE_KEYWORD;
 }
