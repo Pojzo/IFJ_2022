@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tokenizer.h"
+#include "utils.h"
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
-const char separ[] = {' ', '(', ')', '{', '}', '[', ']', ';', '.', ',', '\n', '\r'};
+const char separ[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
 token_t *tokens;
+const int separ_len = 11;
+const int oper_len = 9;
 
 // constructor for struct Token
 token_t *token_create(tok_type token_type_, const char *start_ptr, int lex_length) {
@@ -138,28 +141,46 @@ int dka(char *source, int source_len, token_t *tokens) {
 
 // start state
 state state_start(char c){
-    if (c == whitespace){
-        printf("Tentok more gadzo je whitespace\n");
+    if (c == whitespace || c == '\n'){
         return STATE_START; 
     }
     else if (c == '$'){
-        printf("Tentok more gadzo je $\n");
         return STATE_ID_START;
     }
-    printf("Je to volaco ine\n");
+    else if (is_lower(c)) {
+        return STATE_KEYWORD_START;
+    }
+    else if (arr_contains_char(separ, c, separ_len)) {
+        return STATE_SEP;
+    }
+    else if (c == '/') {
+        return STATE_SEP;
+    }
+    else if (arr_contains_char(operators, c, oper_len)) {
+        return STATE_SEP;
+    }
+    else if (is_digit(c)) {
+        return STATE_LIT_NUM;
+    }
+    else if (is_digit(c)) {
+        return STATE_LIT_STR;
+    }
+
     return STATE_ERROR;
 }
 
 // identifier states
 state state_id_start(char c) {
-    // POBO (TODO)
-    (void) c;
+    if (is_alpha(c) || c ==  '_') { 
+        return STATE_ID_START; 
+    }
     return STATE_ID;
 }
 
 state state_id_main(char c) {
-    // POBO (TODO)
-    (void) c;
+    if (is_alpha(c) || is_digit(c)) {
+            return STATE_IS_KEYWORD;
+            }
     return STATE_ID;
 }
 
