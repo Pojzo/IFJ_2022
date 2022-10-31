@@ -17,6 +17,7 @@ bool is_upper(char c) {
     return (c >= 65 && c <= 90);
 }
 
+
 bool arr_contains_str(const char **arr, const char *element, int arr_len) {
     for (int i = 0; i < arr_len; i++) {
         if (strcmp(arr[i], element) == 0) {
@@ -34,3 +35,6 @@ bool arr_contains_char(const char *arr, char c, int arr_len) {
     }
     return false;
 }
+
+
+

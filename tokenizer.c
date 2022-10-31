@@ -2,15 +2,33 @@
 #include <stdlib.h>
 #include "tokenizer.h"
 #include "utils.h"
+#include <stdbool.h>
+
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
-const char separ[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
+const char separators[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
 token_t *tokens;
 const int separ_len = 11;
 const int oper_len = 9;
+
+
+
+//fucntion checks whether string is keyword 
+bool is_keyword(char *start_ptr, int token_value_len){
+	char *curr_str = malloc((token_value_len + 1) * sizeof(char));
+	for (int i = 0; i <= token_value_len; i++){
+	    curr_str[i] = (char)start_ptr[i]; 
+	}
+	curr_str[token_value_len] = '\0'; 
+	if (arr_contains_str(keywords, curr_str, token_value_len)){
+	    return true;
+	    }
+	return false;
+
+
 
 // constructor for struct Token
 token_t *token_create(tok_type token_type_, const char *start_ptr, int lex_length) {
@@ -93,7 +111,7 @@ void token_array_add(token_array_t *token_array, tok_type token_type, char *star
     // if num_tokens == array_len - if number of tokens is equal to the number of allocated space, we should inflate the
     // array
     
-    if (token_array->num_tokens + 1 == token_array->array_len) {
+   	(token_array->num_tokens + 1 == token_array->array_len) {
         // increase the size by 2 to avoid too many reallocs
         token_array->array_len *= 2;
         token_array->tokens = realloc(token_array->tokens, sizeof(token_t) * token_array->array_len);
@@ -106,7 +124,7 @@ void token_array_add(token_array_t *token_array, tok_type token_type, char *star
 
 // deterministic finite automata
 // returns 1 if there was an error during tokenization
-int dka(char *source, int source_len, token_t *tokens) {
+int dka(char *source, int source_len, token_array_t *tokens) {
     (void) tokens;
     // we'll iterate through all the characters in source
     // each function will return a state
@@ -120,17 +138,20 @@ int dka(char *source, int source_len, token_t *tokens) {
                 current_state = state_start(*(start_ptr + token_value_len));
                 token_value_len++;
                 (void) token_value_len;
-                return 0;
+                break;
             case STATE_ID:
                 // token_t *new_token = token_create(TOK_ID, start_ptr, token_value_len);
                 current_state = state_id_start(*(start_ptr + token_value_len));
                 start_ptr += token_value_len;
                 // (void) new_token;
                 (void) start_ptr;
-                return 0;
+		break;
+	    case STATE_IS_KEYWORD:
+		//start ptr + 1 because the first char is '$' 
+		state_is_keyword(start_ptr + 1, token_value_len -1);
+		break;
             default:
-                return 0;
-
+		break;
                 // pridam tam token
         }
         source += 1;
@@ -150,19 +171,19 @@ state state_start(char c){
     else if (is_lower(c)) {
         return STATE_KEYWORD_START;
     }
-    else if (arr_contains_char(separ, c, separ_len)) {
+    else if (arr_contains_char(separators, c, separ_len)) {
         return STATE_SEP;
     }
     else if (c == '/') {
-        return STATE_SEP;
+        return STATE_OP_START;
     }
     else if (arr_contains_char(operators, c, oper_len)) {
-        return STATE_SEP;
+        return STATE_OP
     }
     else if (is_digit(c)) {
         return STATE_LIT_NUM;
     }
-    else if (is_digit(c)) {
+    else if (c == '"') {
         return STATE_LIT_STR;
     }
 
@@ -172,17 +193,30 @@ state state_start(char c){
 // identifier states
 state state_id_start(char c) {
     if (is_alpha(c) || c ==  '_') { 
-        return STATE_ID_START; 
+        return STATE_ID_MAIN; 
     }
-    return STATE_ID;
+    return STATE_ERROR; 
 }
 
 state state_id_main(char c) {
-    if (is_alpha(c) || is_digit(c)) {
-            return STATE_IS_KEYWORD;
-            }
-    return STATE_ID;
+    if (is_alpha(c) || is_digit(c) || c == '_') {
+        return STATE_ID_MAIN;
+	}
+    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
+        return STATE_IS_KEYWORD; 
+	}
+    return STATE_ERROR;
 }
+//TODO sem musime doniest vsetky tie nacitane pismenka a chujoviny 
+state state_is_keyword(char start_ptr, int token_value_len){
+	if (is_keyword(char start_ptr, int token_value)){
+	    return STATE_ERROR;
+	}
+	return STATE_ID;
+
+
+
+
 
 // keyword states
 state state_keyword_start(char c) {
