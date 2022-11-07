@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-typedef enum {TOK_ID, TOK_KEYWORD, TOK_SEPARATOR, TOK_OPERATOR, TOK_LITERAL} tok_type;
+typedef enum {TOK_ID, TOK_ID_FUNCTION, TOK_KEYWORD, TOK_SEPARATOR, TOK_OPERATOR, TOK_LITERAL} tok_type;
 
 typedef enum {STATE_START, 
 	STATE_ID_START, STATE_ID_MAIN, STATE_ID,
@@ -32,8 +32,8 @@ token_storage_t *token_storage_create();
 void token_storage_free(token_storage_t *token_storage);
 void token_storage_add(token_storage_t *token_storage, tok_type token_type, char *start_ptr, int token_value_len);
 
-int dka(char *source, int source_len, token_storage_t *token_storage);
 bool is_keyword(char *start_ptr, int token_value_len);
+int dka(char *source, int source_len, token_storage_t *token_storage);
 
 // we'll put all states here
 state state_start(char c);

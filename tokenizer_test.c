@@ -17,7 +17,7 @@ int main() {
 
     */
     int error = dka(buffer, strlen(buffer), token_storage);
-    for(int i = 0; i < token_storage->array_len; i++) {
+    for(int i = 0; i < token_storage->num_tokens; i++) {
         token_print(token_storage->tokens[i]);
     }
     printf("Length of token storage -> %d\n", token_storage->num_tokens);

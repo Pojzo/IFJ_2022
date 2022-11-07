@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "utils.h"
 #include <string.h> 
+#include <stdlib.h>
+
 bool is_digit(char c) {
     return c >= 48 && c <= 57;
 }
@@ -35,6 +37,3 @@ bool arr_contains_char(const char *arr, char c, int arr_len) {
     }
     return false;
 }
-
-
-

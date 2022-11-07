@@ -5,7 +5,7 @@
 
 // nerd face
 
-const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
+const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
@@ -13,6 +13,7 @@ const char separators[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\
 token_t *tokens;
 const int separ_len = 11;
 const int oper_len = 9;
+const int keywords_len = 10;
 
 int buffer_read_len = 0;
 
@@ -162,6 +163,23 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 i++;
                 break;
 
+            case STATE_KEYWORD_MAIN:
+                current_state = state_keyword_main(*(start_ptr + token_value_len));
+                if (current_state == STATE_KEYWORD) {
+                    if (is_keyword(start_ptr, token_value_len)) {
+                        token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
+                    }
+                    else {
+                        token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
+                    }
+                    start_ptr += token_value_len;
+                    current_state = STATE_START;
+                    token_value_len = 0;
+                    break;
+                }
+                token_value_len++;
+                i++;
+                break;
 /*
             case STATE_ID:
                 current_state = STATE_START;
@@ -238,6 +256,16 @@ state state_id_main(char c) {
     }
     if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
         return STATE_ID; 
+    }
+    return STATE_ERROR;
+}
+//nerdy face
+state state_keyword_main(char c) {
+    if (is_alpha(c) || is_digit(c) || c == '_') {
+        return STATE_KEYWORD_MAIN;
+    }
+    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
+        return STATE_KEYWORD; 
     }
     return STATE_ERROR;
 }
