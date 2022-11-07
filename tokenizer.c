@@ -3,6 +3,7 @@
 #include "tokenizer.h"
 #include "utils.h"
 
+// nerd face
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
