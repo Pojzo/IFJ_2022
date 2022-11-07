@@ -3,7 +3,7 @@
 #include "tokenizer.h"
 
 int main() {
-    char *buffer = "                    $gazdik;  $8kokot    ;";
+    char *buffer = "koko $gazdik;  $8kokot    ;";
     token_storage_t *token_storage = token_storage_create();
     /*
     token_storage_add(token_storage, TOK_ID, buffer, 2);
