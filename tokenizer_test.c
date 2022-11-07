@@ -3,7 +3,7 @@
 #include "tokenizer.h"
 
 int main() {
-    char *buffer = "                    $gazdik;;;  $kokot    ;";
+    char *buffer = "                    $gazdik;  $8kokot    ;";
     token_storage_t *token_storage = token_storage_create();
     /*
     token_storage_add(token_storage, TOK_ID, buffer, 2);
@@ -23,5 +23,8 @@ int main() {
     printf("Length of token storage -> %d\n", token_storage->num_tokens);
 
     token_storage_free(token_storage);
+    if (error) {
+        printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
+    }
     return error;
 }

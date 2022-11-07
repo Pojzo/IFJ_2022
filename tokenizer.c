@@ -130,7 +130,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
     int token_value_len = 0;
     int i = 0;
     while (i <= source_len) {
-        printf("%c\n", *(start_ptr + token_value_len));
         switch (current_state) {
             case STATE_START:
                 if (*(start_ptr + token_value_len) == ' ') {
@@ -139,27 +138,23 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                     continue;
                 }
-                printf(" start\n");
                 current_state = state_start(*(start_ptr + token_value_len));
                 token_value_len++;
                 i++;
                 break;
 
             case STATE_ID_START:
-                printf("id id start\n");
                 current_state = state_id_start(*(start_ptr + token_value_len));
                 token_value_len++;
                 i++;
                 break;
 
             case STATE_ID_MAIN:
-                printf("id main\n");
                 current_state = state_id_main(*(start_ptr + token_value_len));
                 if (current_state == STATE_ID) {
                     token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                     start_ptr += token_value_len;
                     current_state = STATE_START;
-                    printf("totok je token value%c\n", *start_ptr);
                     token_value_len = 0;
                     break;
                 }
@@ -169,7 +164,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
 /*
             case STATE_ID:
-                printf("state_id\n");
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                 start_ptr += token_value_len;
@@ -183,13 +177,14 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_SEP:
-                printf("STATE_SEP%c\n", *start_ptr);
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_SEPARATOR, start_ptr, token_value_len);
                 start_ptr++;
                 token_value_len = 0;
                 break;
                 
+            case STATE_ERROR:
+                return 1;
             default:
                 break;
         }
