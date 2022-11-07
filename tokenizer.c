@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "tokenizer.h"
 #include "utils.h"
-#include <stdbool.h>
 
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
@@ -18,16 +17,16 @@ const int oper_len = 9;
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
-	char *curr_str = malloc((token_value_len + 1) * sizeof(char));
-	for (int i = 0; i <= token_value_len; i++){
-	    curr_str[i] = (char)start_ptr[i]; 
-	}
-	curr_str[token_value_len] = '\0'; 
-	if (arr_contains_str(keywords, curr_str, token_value_len)){
-	    return true;
-	    }
-	return false;
-
+    char *curr_str = malloc((token_value_len + 1) * sizeof(char));
+    for (int i = 0; i <= token_value_len; i++){
+        curr_str[i] = (char)start_ptr[i]; 
+    }
+    curr_str[token_value_len] = '\0'; 
+    if (arr_contains_str(keywords, curr_str, token_value_len)){
+        return true;
+    }
+    return false;
+}
 
 
 // constructor for struct Token
@@ -66,66 +65,66 @@ void token_print(token_t *token) {
 }
 
 // ADDED
-// constructor for token_array
-token_array_t *token_array_create() {
-    // dynamically allocate space for token_array structure
-    token_array_t *token_array = malloc(sizeof(token_array_t));
+// constructor for token_storage
+token_storage_t *token_storage_create() {
+    // dynamically allocate space for token_storage structure
+    token_storage_t *token_storage = malloc(sizeof(token_storage_t));
 
     // check if malloc failed
-    if (token_array == NULL) {
+    if (token_storage == NULL) {
         // TODO tuto dame nejaky error;
         return NULL;
     }
 
-    token_array->tokens = NULL;
+    token_storage->tokens = NULL;
 
     // num tokens represents the number of tokens currently present in the array
-    token_array->num_tokens = 0;
+    token_storage->num_tokens = 0;
 
     // array_len represents memory allocated for array_len tokens
-    token_array->array_len = 1;
+    token_storage->array_len = 1;
 
-    return token_array;
+    return token_storage;
 }
 
 // ADDED
-void token_array_free(token_array_t *token_array) {
+void token_storage_free(token_storage_t *token_storage) {
     // iterate over tokens and free each one of them
-    for (int i = 0; i < token_array->num_tokens; i++) {
-        token_free(token_array->tokens[i]);
-        token_array->tokens[i] = NULL;
+    for (int i = 0; i < token_storage->num_tokens; i++) {
+        token_free(token_storage->tokens[i]);
+        token_storage->tokens[i] = NULL;
     }
-    free(token_array->tokens);
-    free(token_array);
+    free(token_storage->tokens);
+    free(token_storage);
 }
 
 // ADDED
 // adds token to token array
-void token_array_add(token_array_t *token_array, tok_type token_type, char *start_ptr, int token_value_len) {
+void token_storage_add(token_storage_t *token_storage, tok_type token_type, char *start_ptr, int token_value_len) {
     // create new token
     token_t *token = token_create(token_type, start_ptr, token_value_len);
     if (token == NULL) {
         // TODO tu dame nejaky error
     }
-    
+
     // if num_tokens == array_len - if number of tokens is equal to the number of allocated space, we should inflate the
     // array
-    
-   	(token_array->num_tokens + 1 == token_array->array_len) {
+
+    if (token_storage->num_tokens + 1 == token_storage->array_len) {
         // increase the size by 2 to avoid too many reallocs
-        token_array->array_len *= 2;
-        token_array->tokens = realloc(token_array->tokens, sizeof(token_t) * token_array->array_len);
+        token_storage->array_len *= 2;
+        token_storage->tokens = realloc(token_storage->tokens, sizeof(token_t) * token_storage->array_len);
     }
     // add the newly created token to our array
-    token_array->tokens[token_array->num_tokens++] = token;
+    token_storage->tokens[token_storage->num_tokens++] = token;
 }
 
 
 
 // deterministic finite automata
 // returns 1 if there was an error during tokenization
-int dka(char *source, int source_len, token_array_t *tokens) {
-    (void) tokens;
+int dka(char *source, int source_len, token_storage_t *token_storage) {
+    (void) token_storage;
     // we'll iterate through all the characters in source
     // each function will return a state
     // the returned state will determine the next function to be called
@@ -145,13 +144,13 @@ int dka(char *source, int source_len, token_array_t *tokens) {
                 start_ptr += token_value_len;
                 // (void) new_token;
                 (void) start_ptr;
-		break;
-	    case STATE_IS_KEYWORD:
-		//start ptr + 1 because the first char is '$' 
-		state_is_keyword(start_ptr + 1, token_value_len -1);
-		break;
+                break;
+            case STATE_IS_KEYWORD:
+                //start ptr + 1 because the first char is '$' 
+                state_is_keyword(start_ptr + 1, token_value_len -1);
+                break;
             default:
-		break;
+                break;
                 // pridam tam token
         }
         source += 1;
@@ -178,7 +177,7 @@ state state_start(char c){
         return STATE_OP_START;
     }
     else if (arr_contains_char(operators, c, oper_len)) {
-        return STATE_OP
+        return STATE_OP;
     }
     else if (is_digit(c)) {
         return STATE_LIT_NUM;
@@ -201,26 +200,24 @@ state state_id_start(char c) {
 state state_id_main(char c) {
     if (is_alpha(c) || is_digit(c) || c == '_') {
         return STATE_ID_MAIN;
-	}
+    }
     if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
         return STATE_IS_KEYWORD; 
-	}
+    }
     return STATE_ERROR;
 }
 //TODO sem musime doniest vsetky tie nacitane pismenka a chujoviny 
-state state_is_keyword(char start_ptr, int token_value_len){
-	if (is_keyword(char start_ptr, int token_value)){
-	    return STATE_ERROR;
-	}
-	return STATE_ID;
+state state_is_keyword(char *start_ptr, int token_value_len){
+    if (is_keyword(start_ptr, token_value_len)) {
+        return STATE_ERROR;
+    }
+    return STATE_ID;
 
-
-
-
-
-// keyword states
-state state_keyword_start(char c) {
-    // POBO (TODO)
-    (void) c;
-    return STATE_KEYWORD;
+    // keyword states
+    /*state state_keyword_start(char c) {
+        // POBO (TODO)
+        (void) c;
+        return STATE_KEYWORD;
+    }
+    */
 }
