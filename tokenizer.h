@@ -11,7 +11,8 @@ typedef enum {STATE_START,
        	STATE_SEP,
        	STATE_LIT_NUM, STATE_LIT_STR,
 	STATE_OP_START, STATE_OP,
-       	STATE_ERROR} state;
+       	STATE_ERROR,
+STATE_COMMENT_START, STATE_COMMENT_SINGLE, STATE_COMMENT_MULTI, STATE_COMMENT_MULTI2} state;
 
 typedef struct Token {
     tok_type token_type;

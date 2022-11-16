@@ -3,16 +3,16 @@
 #include "tokenizer.h"
 #include "utils.h"
 
-// nerd face
-
 const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
+const char *string_operators[] = {"===", "!==", ">=", "<="};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
 const char separators[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
 token_t *tokens;
 const int separ_len = 11;
 const int oper_len = 9;
+const int string_oper_len = 5;
 const int keywords_len = 10;
 
 int buffer_read_len = 0;
@@ -131,32 +131,33 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
     int token_value_len = 0;
     int i = 0;
     while (i <= source_len) {
+        char current_char = source[i];
         switch (current_state) {
             case STATE_START:
-                if (*(start_ptr + token_value_len) == ' ') {
+                if (current_char == ' ') {
                     start_ptr += 1;
-                    token_value_len = 0;
                     i++;
                     continue;
                 }
-                current_state = state_start(*(start_ptr + token_value_len));
-                token_value_len++;
+                current_state = state_start(current_char);
+                token_value_len = 1;
                 i++;
                 break;
 
             case STATE_ID_START:
-                current_state = state_id_start(*(start_ptr + token_value_len));
+                current_state = state_id_start(current_char);
                 token_value_len++;
                 i++;
                 break;
 
             case STATE_ID_MAIN:
-                current_state = state_id_main(*(start_ptr + token_value_len));
+                current_state = state_id_main(current_char);
+                // we read the whole identifier
                 if (current_state == STATE_ID) {
                     token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                     start_ptr += token_value_len;
                     current_state = STATE_START;
-                    token_value_len = 0;
+                    printf("Token length: %d\n", token_value_len);
                     break;
                 }
                 token_value_len++;
@@ -164,7 +165,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_KEYWORD_MAIN:
-                current_state = state_keyword_main(*(start_ptr + token_value_len));
+                current_state = state_keyword_main(current_char);
                 if (current_state == STATE_KEYWORD) {
                     if (is_keyword(start_ptr, token_value_len)) {
                         token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
@@ -174,21 +175,11 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     }
                     start_ptr += token_value_len;
                     current_state = STATE_START;
-                    token_value_len = 0;
                     break;
                 }
                 token_value_len++;
                 i++;
                 break;
-/*
-            case STATE_ID:
-                current_state = STATE_START;
-                token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
-                start_ptr += token_value_len;
-                token_value_len = 0;
-                //start_ptr--;
-                break;
-*/
 
             case STATE_IS_KEYWORD:
                 state_is_keyword(start_ptr + 1, token_value_len -1);
@@ -198,8 +189,75 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_SEPARATOR, start_ptr, token_value_len);
                 start_ptr++;
-                token_value_len = 0;
+                i++;
                 break;
+
+            // /...
+            case STATE_COMMENT_START:
+                if (current_char == '/') {
+                    token_value_len++;
+                    current_state = STATE_COMMENT_SINGLE; 
+                    i += 1;
+                }
+                else if (current_char == '*') {
+                    token_value_len++;
+                    current_state = STATE_COMMENT_MULTI;
+                    i += 1;
+                }
+                else {
+                    // if it's not a comment then it must be divisor operator
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
+                    start_ptr += 1;
+                    current_state = STATE_START;
+                }
+
+                break;
+
+            //.....
+            case STATE_COMMENT_SINGLE:
+                // only end comment with new line
+                if (current_char == '\n') {
+                    start_ptr += token_value_len + 1;
+                    i++;
+                    current_state = STATE_START;
+                }
+                else {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_COMMENT_SINGLE;
+                }
+                break;
+
+            // /*....
+            case STATE_COMMENT_MULTI:
+                if (current_char == '*') {
+                    current_state = STATE_COMMENT_MULTI2;
+                    i++;
+                    token_value_len++;
+                }
+                else {
+                    current_state = STATE_COMMENT_MULTI;
+                    i++;
+                    token_value_len++;
+                }
+                break;
+
+            // /*... *
+            case STATE_COMMENT_MULTI2:
+                // 92 is backslash
+                // if its the end of mulitline comment go to start
+                if (current_char == 92) {
+                    start_ptr += token_value_len + 1;
+                    current_state = STATE_START;
+                    i += 1;
+                }
+                // if its not the go back to /*...
+                else {
+                    current_state = STATE_COMMENT_MULTI;
+                    i += 1;
+                }
+                break;
+                
                 
             case STATE_ERROR:
                 return 1;
@@ -227,7 +285,7 @@ state state_start(char c){
         return STATE_SEP;
     }
     else if (c == '/') {
-        return STATE_OP_START;
+        return STATE_COMMENT_START;
     }
     else if (arr_contains_char(operators, c, oper_len)) {
         return STATE_OP;
@@ -259,7 +317,7 @@ state state_id_main(char c) {
     }
     return STATE_ERROR;
 }
-//nerdy face
+
 state state_keyword_main(char c) {
     if (is_alpha(c) || is_digit(c) || c == '_') {
         return STATE_KEYWORD_MAIN;
@@ -269,6 +327,7 @@ state state_keyword_main(char c) {
     }
     return STATE_ERROR;
 }
+
 //TODO sem musime doniest vsetky tie nacitane pismenka a chujoviny 
 state state_is_keyword(char *start_ptr, int token_value_len){
     if (is_keyword(start_ptr, token_value_len)) {

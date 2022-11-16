@@ -2,20 +2,29 @@
 #include <string.h>
 #include "tokenizer.h"
 
-int main() {
-    char *buffer = "koko $gazdik;  $8kokot    ;";
-    token_storage_t *token_storage = token_storage_create();
-    /*
-    token_storage_add(token_storage, TOK_ID, buffer, 2);
-    token_storage_add(token_storage, TOK_KEYWORD, buffer, 3);
-    token_storage_add(token_storage, TOK_SEPARATOR, buffer, 4);
-    token_storage_add(token_storage, TOK_LITERAL, buffer, 5);
-    printf("Tokenizer->num_tokens: %d\nTokenizer->array_len %d\n", token_storage->num_tokens, token_storage->array_len);
-    for(int i = 0; i < 4; i++) {
-        token_print(token_storage->tokens[i]);
-    }
+#define MAX_BUFFER_LEN 1000
 
-    */
+#define DEBUG
+
+int main() {
+    FILE *fp;
+    fp = fopen("input", "r");
+    if (ferror(fp)) {
+        printf("Couldn't open input file\n");
+        fclose(fp);
+        return 1;
+    }
+    char buffer[MAX_BUFFER_LEN];
+    char c;
+    int i = 0;
+    while ((c = fgetc(fp)) != EOF) {
+        buffer[i++] = c;
+    }
+    buffer[i] = '\0';
+    printf("%s\n", buffer);
+    printf("%d\n", (int)strlen(buffer));
+    fclose(fp);
+    token_storage_t *token_storage = token_storage_create();
     int error = dka(buffer, strlen(buffer), token_storage);
     for(int i = 0; i < token_storage->num_tokens; i++) {
         token_print(token_storage->tokens[i]);
