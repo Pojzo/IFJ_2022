@@ -3,7 +3,7 @@
 #include "tokenizer.h"
 #include "utils.h"
 
-const int DEBUG = 1;
+const int DEBUG = 0;
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
@@ -23,11 +23,11 @@ int buffer_read_len = 0;
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
     char *curr_str = malloc((token_value_len + 1) * sizeof(char));
-    for (int i = 0; i <= token_value_len; i++){
+    for (int i = 0; i < token_value_len; i++){
         curr_str[i] = (char)start_ptr[i]; 
     }
     curr_str[token_value_len] = '\0'; 
-    if (arr_contains_str(keywords, curr_str, token_value_len)){
+    if (arr_contains_str(keywords, curr_str, keywords_len)){
         return true;
     }
     return false;
@@ -188,11 +188,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 i++;
                 break;
 
-            case STATE_IS_KEYWORD:
-                if (DEBUG) debug_print_state("STATE_IS_KEYWORD", start_ptr, token_value_len);
-                state_is_keyword(start_ptr + 1, token_value_len -1);
-                break;
-
             case STATE_SEP:
                 if (DEBUG) debug_print_state("STATE_SEP", start_ptr, token_value_len);
                 current_state = STATE_START;
@@ -289,7 +284,7 @@ state state_start(char c){
         return STATE_ID_START;
     }
     else if (is_lower(c)) {
-        return STATE_KEYWORD_START;
+        return STATE_KEYWORD_MAIN;
     }
     else if (arr_contains_char(separators, c, separ_len)) {
         return STATE_SEP;
@@ -336,20 +331,4 @@ state state_keyword_main(char c) {
         return STATE_KEYWORD; 
     }
     return STATE_ERROR;
-}
-
-//TODO sem musime doniest vsetky tie nacitane pismenka a chujoviny 
-state state_is_keyword(char *start_ptr, int token_value_len){
-    if (is_keyword(start_ptr, token_value_len)) {
-        return STATE_ERROR;
-    }
-    return STATE_ID;
-
-    // keyword states
-    /*state state_keyword_start(char c) {
-    // POBO (TODO)
-    (void) c;
-    return STATE_KEYWORD;
-    }
-    */
 }

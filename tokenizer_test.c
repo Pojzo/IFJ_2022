@@ -35,5 +35,4 @@ int main() {
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
     }
-    return error;
 }
