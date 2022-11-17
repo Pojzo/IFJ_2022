@@ -10,4 +10,5 @@ bool is_upper(char c);
 bool arr_contains_str(const char **arr, const char *element, int arr_len);
 bool arr_contains_char(const char *arr, char c, int arr_len);
 
+void debug_print_state(const char *state_name, const char *string_ptr, int string_length);
 #endif

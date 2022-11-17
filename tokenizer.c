@@ -3,6 +3,8 @@
 #include "tokenizer.h"
 #include "utils.h"
 
+const int DEBUG = 1;
+
 const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
@@ -125,7 +127,6 @@ void token_storage_add(token_storage_t *token_storage, tok_type token_type, char
 // deterministic finite automata
 // returns 1 if there was an error during tokenization
 int dka(char *source, int source_len, token_storage_t *token_storage) {
-    (void) source_len;
     state current_state = STATE_START;
     char *start_ptr = source;
     int token_value_len = 0;
@@ -134,30 +135,35 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
         char current_char = source[i];
         switch (current_state) {
             case STATE_START:
-                if (current_char == ' ') {
-                    start_ptr += 1;
+                if (current_char == ' ' || current_char == '\n') {
+                    start_ptr++;
                     i++;
-                    continue;
+                    current_state = STATE_START;
+                    break;
                 }
-                current_state = state_start(current_char);
+                if (DEBUG) debug_print_state("STATE_START", start_ptr, 1);
+                printf("%c %d\n", current_char, current_char == *start_ptr);
                 token_value_len = 1;
                 i++;
+                current_state = state_start(current_char);
                 break;
 
             case STATE_ID_START:
+                if (DEBUG) debug_print_state("STATE_ID_START", start_ptr, token_value_len);
                 current_state = state_id_start(current_char);
                 token_value_len++;
                 i++;
                 break;
 
             case STATE_ID_MAIN:
+                if (DEBUG) debug_print_state("STATE_ID_MAIN", start_ptr, token_value_len);
                 current_state = state_id_main(current_char);
                 // we read the whole identifier
                 if (current_state == STATE_ID) {
+                    // printf("Current char: %c %d\n", current_char, current_char == '\n');
                     token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                     start_ptr += token_value_len;
                     current_state = STATE_START;
-                    printf("Token length: %d\n", token_value_len);
                     break;
                 }
                 token_value_len++;
@@ -165,6 +171,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_KEYWORD_MAIN:
+                if (DEBUG) debug_print_state("STATE_KEYWORD_MAIN", start_ptr, token_value_len);
                 current_state = state_keyword_main(current_char);
                 if (current_state == STATE_KEYWORD) {
                     if (is_keyword(start_ptr, token_value_len)) {
@@ -182,18 +189,20 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_IS_KEYWORD:
+                if (DEBUG) debug_print_state("STATE_IS_KEYWORD", start_ptr, token_value_len);
                 state_is_keyword(start_ptr + 1, token_value_len -1);
                 break;
 
             case STATE_SEP:
+                if (DEBUG) debug_print_state("STATE_SEP", start_ptr, token_value_len);
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_SEPARATOR, start_ptr, token_value_len);
                 start_ptr++;
-                i++;
                 break;
 
             // /...
             case STATE_COMMENT_START:
+                if (DEBUG) debug_print_state("STATE_COMMENT_START", start_ptr, token_value_len);
                 if (current_char == '/') {
                     token_value_len++;
                     current_state = STATE_COMMENT_SINGLE; 
@@ -215,6 +224,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             //.....
             case STATE_COMMENT_SINGLE:
+                if (DEBUG) debug_print_state("STATE_COMMENT_SINGLE", start_ptr, token_value_len);
                 // only end comment with new line
                 if (current_char == '\n') {
                     start_ptr += token_value_len + 1;
@@ -230,6 +240,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             // /*....
             case STATE_COMMENT_MULTI:
+                if (DEBUG) debug_print_state("STATE_COMMENT_MULTI", start_ptr, token_value_len);
                 if (current_char == '*') {
                     current_state = STATE_COMMENT_MULTI2;
                     i++;
@@ -244,9 +255,8 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             // /*... *
             case STATE_COMMENT_MULTI2:
-                // 92 is backslash
-                // if its the end of mulitline comment go to start
-                if (current_char == 92) {
+                if (DEBUG) debug_print_state("STATE_COMMENT_MULTI2", start_ptr, token_value_len);
+                if (current_char == '/') {
                     start_ptr += token_value_len + 1;
                     current_state = STATE_START;
                     i += 1;

@@ -37,3 +37,11 @@ bool arr_contains_char(const char *arr, char c, int arr_len) {
     }
     return false;
 }
+
+void debug_print_state(const char *state_name, const char *string_ptr, int string_length) {
+    printf("%s ", state_name);
+    for (int i = 0; i < string_length - 1; i++) {
+        printf("%c", *(string_ptr + i)); 
+    }
+    printf("%c\n", *(string_ptr + string_length - 1));
+}
