@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+
 typedef enum {TOK_ID, TOK_ID_FUNCTION, TOK_KEYWORD, TOK_SEPARATOR, TOK_OPERATOR, TOK_LITERAL} tok_type;
 
 typedef enum {STATE_START, 
