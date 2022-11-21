@@ -32,19 +32,3 @@ bool test_arr_contains_char() {
     const char arr[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
     return arr_contains_char(arr, 'a', 26) && arr_contains_char(arr, 'b', 26) && arr_contains_char(arr, 'c', 26) && arr_contains_char(arr, 'd', 26) && arr_contains_char(arr, 'e', 26) && arr_contains_char(arr, 'f', 26) && arr_contains_char(arr, 'g', 26) && arr_contains_char(arr, 'h', 26) && arr_contains_char(arr, 'i', 26) && arr_contains_char(arr, 'j', 26) && arr_contains_char(arr, 'k', 26) && arr_contains_char(arr, 'l', 26) && arr_contains_char(arr, 'm', 26) && arr_contains_char(arr, 'n', 26) && arr_contains_char(arr, 'o', 26) && arr_contains_char(arr, 'p', 26) && arr_contains_char(arr, 'q', 26) && arr_contains_char(arr, 'r', 26) && arr_contains_char(arr, 's', 26) && arr_contains_char(arr, 't', 26) && arr_contains_char(arr, 'u', 26) && arr_contains_char(arr, 'v', 26) && arr_contains_char(arr, 'w', 26) && arr_contains_char(arr, 'x', 26) && arr_contains_char(arr, 'y', 26) && arr_contains_char(arr, 'z', 26);
 }
-
-// napriklad ani jednu z tychto funkci som nespravil ja, ale vsetky su pouzite v utils.c
-// takze som ich tu testoval
-// a vsetky testy prebehli uspesne
-// takze som si myslel, ze je to ok
-// ale ked som ich nahradil za moje, tak mi to nejde
-// a neviem preco
-// takze som ich tu nechal
-// a neviem preco
-// ale asi to bude nejaky problem s mojimi funkciami
-// alebo s tym, ze ich pouzivam
-// diese Tests sind nicht von mir, aber ich habe sie benutzt, um zu testen, ob meine Funktionen funktionieren
-// und sie funktionieren
-// aber wenn ich sie durch meine ersetze, dann funktionieren sie nicht
-// und ich weiss nicht warum
-// also habe ich sie hier gelassen
