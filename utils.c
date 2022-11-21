@@ -29,6 +29,7 @@ bool arr_contains_str(const char **arr, const char *element, int arr_len) {
     return false;
 }
 
+
 bool arr_contains_char(const char *arr, char c, int arr_len) {
     for (int i = 0; i < arr_len; i++) {
         if (arr[i] == c) {
