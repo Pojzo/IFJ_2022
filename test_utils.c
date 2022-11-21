@@ -43,3 +43,8 @@ bool test_arr_contains_char() {
 // a neviem preco
 // ale asi to bude nejaky problem s mojimi funkciami
 // alebo s tym, ze ich pouzivam
+// diese Tests sind nicht von mir, aber ich habe sie benutzt, um zu testen, ob meine Funktionen funktionieren
+// und sie funktionieren
+// aber wenn ich sie durch meine ersetze, dann funktionieren sie nicht
+// und ich weiss nicht warum
+// also habe ich sie hier gelassen
