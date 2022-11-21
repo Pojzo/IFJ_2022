@@ -38,7 +38,5 @@ int main() {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
     }
 
-    test_states();
-
     return error;
 }
