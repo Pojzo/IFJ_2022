@@ -1,8 +1,13 @@
-/*
-malo by to asi ist
-*/
 
-$gazdik; $cmorik; 
-// za mna teoreticky by to mohlo ist
-$koko
-else float function; if $hovno int return;
+function is_prime(int $a) : int{
+    if ($a < 2) {
+        return 0;
+    }
+}
+    for ($i = 2; $i < $a; $i++) {
+        if ($a + $i === 0) {
+            return 0;
+        }
+    }
+    return 1;
+}

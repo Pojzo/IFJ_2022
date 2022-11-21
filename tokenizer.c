@@ -2,19 +2,21 @@
 #include <stdlib.h>
 #include "tokenizer.h"
 #include "utils.h"
+#include <assert.h>
+#include <string.h>
 
-const int DEBUG = 0;
+const int DEBUG = 1;
 
 const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *string_operators[] = {"===", "!==", ">=", "<="};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
-const char separators[] = {' ', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
+const char separators[] = {' ', ':', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
 token_t *tokens;
-const int separ_len = 11;
+const int separ_len = 12;
 const int oper_len = 9;
-const int string_oper_len = 5;
+const int string_oper_len = 4;
 const int keywords_len = 10;
 
 int buffer_read_len = 0;
@@ -66,7 +68,7 @@ void token_print(token_t *token) {
     if (token == NULL) {
         return;
     }
-    printf("Token->type: %s\nToken->value: %s\n", TOK_STR[token->token_type], token->value);
+    printf("Token->type: %s\nToken->value: %s - %d\n", TOK_STR[token->token_type], token->value, (int)strlen(token->value));
 }
 
 // ADDED
@@ -126,25 +128,25 @@ void token_storage_add(token_storage_t *token_storage, tok_type token_type, char
 
 // deterministic finite automata
 // returns 1 if there was an error during tokenization
+int token_value_len = 0;
+int i = 0;
+char *start_ptr;
 int dka(char *source, int source_len, token_storage_t *token_storage) {
     state current_state = STATE_START;
-    char *start_ptr = source;
-    int token_value_len = 0;
-    int i = 0;
+    start_ptr = source;
     while (i <= source_len) {
         char current_char = source[i];
         switch (current_state) {
             case STATE_START:
-                if (current_char == ' ' || current_char == '\n') {
+                if (current_char == ' ' || current_char == '\n') {  
                     start_ptr++;
                     i++;
                     current_state = STATE_START;
                     break;
                 }
                 if (DEBUG) debug_print_state("STATE_START", start_ptr, 1);
-                printf("%c %d\n", current_char, current_char == *start_ptr);
+                start_ptr = &source[i];
                 token_value_len = 1;
-                i++;
                 current_state = state_start(current_char);
                 break;
 
@@ -162,7 +164,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (current_state == STATE_ID) {
                     // printf("Current char: %c %d\n", current_char, current_char == '\n');
                     token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
-                    start_ptr += token_value_len;
                     current_state = STATE_START;
                     break;
                 }
@@ -180,7 +181,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     else {
                         token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                     }
-                    start_ptr += token_value_len;
                     current_state = STATE_START;
                     break;
                 }
@@ -192,7 +192,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (DEBUG) debug_print_state("STATE_SEP", start_ptr, token_value_len);
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_SEPARATOR, start_ptr, token_value_len);
-                start_ptr++;
                 break;
 
             // /...
@@ -211,7 +210,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 else {
                     // if it's not a comment then it must be divisor operator
                     token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
-                    start_ptr += 1;
                     current_state = STATE_START;
                 }
 
@@ -222,7 +220,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (DEBUG) debug_print_state("STATE_COMMENT_SINGLE", start_ptr, token_value_len);
                 // only end comment with new line
                 if (current_char == '\n') {
-                    start_ptr += token_value_len + 1;
                     i++;
                     current_state = STATE_START;
                 }
@@ -262,9 +259,141 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i += 1;
                 }
                 break;
+            
+            case STATE_OP:
+                if (DEBUG) debug_print_state("STATE_OPERATOR", start_ptr, 1);
+                current_state = STATE_START;
+                token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
+                i++;
+                break;
                 
-                
+            case STATE_EQUAL_1:
+                // =...
+                // token_value_len = 2;
+                //ukazujeme na druheho debila
+                if (DEBUG) debug_print_state("STATE_EQUAL_1", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_value_len++;
+                    current_state = STATE_EQUAL_2;
+                    i++;
+                }
+                else {
+                    current_state = STATE_START;
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
+                }
+                break;
+            case STATE_EQUAL_2:
+            //  ==...
+                if (DEBUG) debug_print_state("STATE_EQUAL_2", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                    i++;
+                }
+                else {
+                    //do toho erroru
+                    current_state = STATE_ERROR;
+                }
+                break;
+            
+            case STATE_NOT_1:
+            // !...
+                if (DEBUG) debug_print_state("STATE_NOT_1", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_value_len++;
+                    current_state = STATE_NOT_2;
+                    i++;
+                }
+                else {
+                    current_state = STATE_ERROR;
+                }
+                break;
+
+            case STATE_NOT_2:
+            // !=...
+                if (DEBUG) debug_print_state("STATE_NOT_2", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                    i++;
+                }
+                else {
+                    current_state = STATE_ERROR;
+                }
+                break;
+            
+            case STATE_GREATER_EQUAL:
+            // >...
+                if (DEBUG) debug_print_state("STATE_GREATER_EQUAL", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                    i++;
+                }
+                else {
+                    
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
+                    current_state = STATE_START;
+                }
+                break;
+            
+            case STATE_SMALLER_EQUAL:
+            // <...
+                if (DEBUG) debug_print_state("STATE_SMALLER_EQUAL", start_ptr, token_value_len);
+                if (current_char == '=') {
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                    i++;
+                }
+                else {
+                    
+                    token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
+                    current_state = STATE_START;
+                }
+                break;
+            
+            case STATE_LIT_NUM:
+            // 2)
+            // 123...
+                if (DEBUG) debug_print_state("STATE_LIT_NUM", start_ptr, token_value_len);
+                if (is_digit(current_char)) {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM;
+                }
+                else if (current_char == '.') {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM_FLOAT;
+                }
+                else {
+                    printf("Token value len: %d start_pointer: %c, current_char: %c\n", token_value_len, *start_ptr, current_char);
+                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                }
+                break;
+            
+            case STATE_LIT_NUM_FLOAT:
+            // 123.123...
+                if (DEBUG) debug_print_state("STATE_LIT_NUM_FLOAT", start_ptr, token_value_len);
+                if (is_digit(current_char)) {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM_FLOAT;
+                }
+                else {
+                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
+                    current_state = STATE_START;
+
+                }
+                break;
+
+            case STATE_TERMINATE:
+            return 0;
+            break;
             case STATE_ERROR:
+                if (DEBUG) debug_print_state("STATE_ERROR", start_ptr, token_value_len);
+                printf("%d\n", (int) *start_ptr);
                 return 1;
             default:
                 break;
@@ -277,31 +406,64 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
 // start state
 state state_start(char c){
-    if (c == whitespace || c == '\n'){
-        return STATE_START; 
-    }
-    else if (c == '$'){
+    if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
+        i++;
+        return STATE_START;
+    } 
+    else if(c == '$') {
+        i++;
         return STATE_ID_START;
     }
-    else if (is_lower(c)) {
+
+    else if (is_digit(c)) {  
+        i++;
+        return STATE_LIT_NUM;
+    }
+    else if (is_alpha(c) || c == '_') {
+        i++;
         return STATE_KEYWORD_MAIN;
     }
     else if (arr_contains_char(separators, c, separ_len)) {
+        i++;
         return STATE_SEP;
     }
     else if (c == '/') {
+        i++;
         return STATE_COMMENT_START;
     }
     else if (arr_contains_char(operators, c, oper_len)) {
+        if (c == '=') {
+            i++;
+            token_value_len++;
+            return STATE_EQUAL_1;
+        }
+        else if (c == '!') {
+             i++;
+            token_value_len++;
+            return STATE_NOT_1;
+        }
+        else if (c == '<') {
+            token_value_len++;
+            i++;
+            return STATE_SMALLER_EQUAL;     
+        }
+        else if (c == '>') {
+            token_value_len++;
+            i++;
+            return STATE_GREATER_EQUAL;
+        }
+        i++;
         return STATE_OP;
     }
-    else if (is_digit(c)) {
-        return STATE_LIT_NUM;
-    }
+
     else if (c == '"') {
+        i++;
+        token_value_len++;
         return STATE_LIT_STR;
     }
-
+    else if (c == '\0') {
+        return STATE_TERMINATE;
+    }
     return STATE_ERROR;
 }
 
@@ -317,7 +479,7 @@ state state_id_main(char c) {
     if (is_alpha(c) || is_digit(c) || c == '_') {
         return STATE_ID_MAIN;
     }
-    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
+    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)) {
         return STATE_ID; 
     }
     return STATE_ERROR;
@@ -327,9 +489,60 @@ state state_keyword_main(char c) {
     if (is_alpha(c) || is_digit(c) || c == '_') {
         return STATE_KEYWORD_MAIN;
     }
-    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)){
+    if (arr_contains_char(separators, c, separ_len) || arr_contains_char(operators, c, oper_len)) {
         return STATE_KEYWORD; 
     }
     return STATE_ERROR;
 }
 
+// test all states for every function in this file
+
+// test state_start
+void test_state_start() {
+    assert(state_start(' ') == STATE_START);
+    assert(state_start('\n') == STATE_START);
+    assert(state_start('$') == STATE_ID_START);
+    assert(state_start('a') == STATE_KEYWORD_MAIN);
+    assert(state_start('A') == STATE_KEYWORD_MAIN);
+    assert(state_start('z') == STATE_KEYWORD_MAIN);
+    assert(state_start('Z') == STATE_KEYWORD_MAIN);
+    assert(state_start('_') == STATE_KEYWORD_MAIN);
+    assert(state_start('0') == STATE_LIT_NUM);
+    assert(state_start('9') == STATE_LIT_NUM);
+    assert(state_start('"') == STATE_LIT_STR);
+    assert(state_start('/') == STATE_COMMENT_START);
+}
+
+// test state_id_start
+void test_state_id_start() {
+    assert(state_id_start('a') == STATE_ID_MAIN);
+    assert(state_id_start('A') == STATE_ID_MAIN);
+    assert(state_id_start('z') == STATE_ID_MAIN);
+    assert(state_id_start('Z') == STATE_ID_MAIN);
+    assert(state_id_start('_') == STATE_ID_MAIN);
+    assert(state_id_start('0') == STATE_ERROR);
+    assert(state_id_start('9') == STATE_ERROR);
+    assert(state_id_start(' ') == STATE_ERROR);
+    assert(state_id_start('\n') == STATE_ERROR);
+}
+
+// test state_id_main
+void test_state_id_main() {
+    assert(state_id_main('a') == STATE_ID_MAIN);
+    assert(state_id_main('A') == STATE_ID_MAIN);
+    assert(state_id_main('z') == STATE_ID_MAIN);
+    assert(state_id_main('Z') == STATE_ID_MAIN);
+    assert(state_id_main('_') == STATE_ID_MAIN);
+    assert(state_id_main('0') == STATE_ID_MAIN);
+    assert(state_id_main('9') == STATE_ID_MAIN);
+    assert(state_id_main(' ') == STATE_ID);
+    assert(state_id_main('\n') == STATE_ID);
+    assert(state_id_main('$') == STATE_ERROR);
+}
+
+//call test functions
+void test_states() {
+    test_state_start();
+    test_state_id_start();
+    test_state_id_main();
+}

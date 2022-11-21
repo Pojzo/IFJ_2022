@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "tokenizer.h"
+#include <assert.h> 
 
 #define MAX_BUFFER_LEN 1000
 
@@ -20,7 +21,8 @@ int main() {
     while ((c = fgetc(fp)) != EOF) {
         buffer[i++] = c;
     }
-    buffer[i] = '\0';
+    buffer[i] = ' ';
+    buffer[i+1] = '\0';
     printf("%s\n", buffer);
     printf("%d\n", (int)strlen(buffer));
     fclose(fp);
@@ -35,6 +37,8 @@ int main() {
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
     }
+
+    test_states();
 
     return error;
 }

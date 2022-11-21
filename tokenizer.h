@@ -4,16 +4,17 @@
 #include <stdbool.h>
 
 
-typedef enum {TOK_ID, TOK_ID_FUNCTION, TOK_KEYWORD, TOK_SEPARATOR, TOK_OPERATOR, TOK_LITERAL} tok_type;
+typedef enum {TOK_ID, TOK_ID_FUNCTION, TOK_KEYWORD, TOK_SEPARATOR, TOK_OPERATOR, TOK_LIT} tok_type;
 
 typedef enum {STATE_START, 
 	STATE_ID_START, STATE_ID_MAIN, STATE_ID,
        	STATE_KEYWORD_START, STATE_IS_KEYWORD, STATE_KEYWORD_MAIN, STATE_KEYWORD,
        	STATE_SEP,
        	STATE_LIT_NUM, STATE_LIT_STR,
-	STATE_OP_START, STATE_OP,
+		STATE_OP,
        	STATE_ERROR,
-STATE_COMMENT_START, STATE_COMMENT_SINGLE, STATE_COMMENT_MULTI, STATE_COMMENT_MULTI2} state;
+STATE_COMMENT_START, STATE_COMMENT_SINGLE, STATE_COMMENT_MULTI, STATE_COMMENT_MULTI2,
+STATE_EQUAL_1, STATE_EQUAL_2, STATE_GREATER_EQUAL, STATE_SMALLER_EQUAL, STATE_NOT_1, STATE_NOT_2, STATE_LIT_NUM_FLOAT,STATE_TERMINATE} state;
 
 typedef struct Token {
     tok_type token_type;
@@ -48,5 +49,12 @@ state state_id_main(char c);
 state state_keyword_start(char c);
 state state_keyword_main(char c);
 state state_is_keyword(char *start_ptr, int token_value_len);
+
+// test states
+
+void test_state_start();
+void test_state_id_start();
+void test_state_id_main();
+void test_states();
 
 #endif
