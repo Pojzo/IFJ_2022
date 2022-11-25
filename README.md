@@ -1,5 +1,5 @@
 session 1 (12.10) vystup:
-
+ahoj gazdik
 IFJ projekt TODO:
 1.) Lexicalna analzya 
 
