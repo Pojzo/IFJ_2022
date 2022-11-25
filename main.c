@@ -1,23 +1,25 @@
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include "parser.h"
 #include "tokenizer.h"
-#include <assert.h> 
 
 #define MAX_BUFFER_LEN 1000
 
 #define DEBUG
 
 // comment the code below
-
-int main() {
+char *get_buffer() {
     FILE *fp;
     fp = fopen("input", "r");
     if (ferror(fp)) {
         printf("Couldn't open input file\n");
         fclose(fp);
-        return 1;
+        return NULL;
     }
-    char buffer[MAX_BUFFER_LEN];
+    char *buffer = malloc(MAX_BUFFER_LEN);
     char c;
     int i = 0;
     while ((c = fgetc(fp)) != EOF) {
@@ -28,6 +30,16 @@ int main() {
     printf("%s\n", buffer);
     printf("%d\n", (int)strlen(buffer));
     fclose(fp);
+
+    return buffer;
+}
+
+
+int main() {
+    char *buffer = get_buffer();
+    if (buffer == NULL) {
+        return 1;
+    }
     token_storage_t *token_storage = token_storage_create();
     int error = dka(buffer, strlen(buffer), token_storage);
     for(int i = 0; i < token_storage->num_tokens; i++) {
@@ -39,6 +51,6 @@ int main() {
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
     }
-
+    free(buffer);
     return error;
 }
