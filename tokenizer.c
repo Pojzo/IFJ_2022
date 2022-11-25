@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+// cigani su dobri...
+
 #include "tokenizer.h"
 #include "utils.h"
 #include <assert.h>
@@ -20,7 +22,6 @@ const int string_oper_len = 4;
 const int keywords_len = 10;
 
 int buffer_read_len = 0;
-
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){

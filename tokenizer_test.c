@@ -7,6 +7,8 @@
 
 #define DEBUG
 
+// comment the code below
+
 int main() {
     FILE *fp;
     fp = fopen("input", "r");
