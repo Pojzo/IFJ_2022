@@ -373,7 +373,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_START;
                 }
                 break;
-            
             case STATE_LIT_NUM_FLOAT:
             // 123.123...
                 if (DEBUG) debug_print_state("STATE_LIT_NUM_FLOAT", start_ptr, token_value_len);
@@ -386,6 +385,21 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
 
+                }
+                break;
+            
+            case STATE_LIT_STR:
+            // "..
+                if (DEBUG) debug_print_state("STATE_LIT_STR", start_ptr, token_value_len);
+                if (current_char == '"') {
+                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                    i++;
+                }
+                else {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_STR;
                 }
                 break;
 

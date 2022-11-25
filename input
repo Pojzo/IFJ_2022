@@ -3,4 +3,18 @@ function is_prime(int $a) : int{
     if ($a < 2.5324234) {
         return 0;
     }
+    write("GAzdik je kokot\n");
+}
+
+function print_kokot() : int {
+    write("kokot\n");
+}
+
+// function to call 'print_kokot' 5 times using while loops
+function print_kokot_5_times() : int {
+    $i = 0;
+    while ($i < 5) {
+        print_kokot();
+        $i = $i + 1;
+    }
 }
