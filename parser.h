@@ -3,7 +3,8 @@
 
 #include "tokenizer.h"
 
-void start();
+
+int parser_start(char *buffer);
 token_t *get_token();
 
 

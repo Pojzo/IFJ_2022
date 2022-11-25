@@ -6,7 +6,7 @@
 #include "parser.h"
 #include "tokenizer.h"
 
-#define MAX_BUFFER_LEN 1000
+const int MAX_BUFFER_LEN = 1000;
 
 #define DEBUG
 
@@ -40,17 +40,8 @@ int main() {
     if (buffer == NULL) {
         return 1;
     }
-    token_storage_t *token_storage = token_storage_create();
-    int error = dka(buffer, strlen(buffer), token_storage);
-    for(int i = 0; i < token_storage->num_tokens; i++) {
-        token_print(token_storage->tokens[i]);
-    }
-    printf("Length of token storage -> %d\n", token_storage->num_tokens);
+    int error = parser_start(buffer);
 
-    token_storage_free(token_storage);
-    if (error) {
-        printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
-    }
     free(buffer);
     return error;
 }
