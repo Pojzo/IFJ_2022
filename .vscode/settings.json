@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "input": "c",
-        "tokenizer.h": "c"
+        "tokenizer.h": "c",
+        "*.tcc": "c"
     }
 }

@@ -22,6 +22,8 @@ const int oper_len = 9;
 const int string_oper_len = 4;
 const int keywords_len = 10;
 
+const char *prolog = 
+
 int buffer_read_len = 0;
 
 //fucntion checks whether string is keyword 
