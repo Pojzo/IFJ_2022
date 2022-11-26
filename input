@@ -1,20 +1,25 @@
-
-function is_prime(int $a) : int{
-    if ($a < 2.5324234) {
-        return 0;
-    }
-    write("GAzdik je kokot\n");
+// Program 2: Vypocet faktorialu (rekurzivne)
+// Hlavni telo programu
+write("Zadejte cislo pro vypocet faktorialu: ");
+$a = readi();
+// Definice funkce pro vypocet hodnoty faktorialu
+function factorial(int $n) : int {
+if ($n < 2) {
+$result = 1;
+} else {
+$decremented_n = $n - 1;
+$temp_result = factorial($decremented_n);
+$result = $n * $temp_result;
 }
-
-function print_kokot() : int {
-    write("kokot\n");
+return $result;
 }
-
-// function to call 'print_kokot' 5 times using while loops
-function print_kokot_5_times() : int {
-    $i = 0;
-    while ($i < 5) {
-        print_kokot();
-        $i = $i + 1;
-    }
+if ($a !== null) {
+if ($a < 0) { // Pokracovani hlavniho tela programu
+write("Faktorial nelze spocitat\n");
+} else {
+$vysl = factorial($a);
+write("Vysledek je: ", $vysl, "\n");
+}
+} else {
+write("Chyba pri nacitani celeho cisla!\n");
 }

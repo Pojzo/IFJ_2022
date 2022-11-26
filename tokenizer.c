@@ -471,7 +471,12 @@ state state_start(char c){
         i++;
         return STATE_OP;
     }
+    else if (c == '!') {
+        i++;
+        token_value_len++;
+        return STATE_NOT_1;
 
+    }
     else if (c == '"') {
         i++;
         token_value_len++;
