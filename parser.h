@@ -5,7 +5,7 @@
 
 
 int parser_start(char *buffer);
-token_t *get_token();
+token_t *get_token(token_storage_t *token_storage);
 
 
 #endif

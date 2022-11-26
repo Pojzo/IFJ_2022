@@ -12,3 +12,6 @@ bst.o: bst.c
 
 tokenizer: main.c tokenizer.c tokenizer.h utils.c utils.h symtable.c symtable.h parser.c parser.h
 	$(CC) $(FLAGS) main.c tokenizer.c tokenizer.h utils.c symtable.c parser.c -o tokenizer
+
+tokrun: tokenizer
+	./tokenizer
