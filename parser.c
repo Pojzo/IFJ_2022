@@ -1,34 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "tokenizer.h"
 #include "parser.h"
 
 
 int token_index = 0;
+extern const char *prolog;
+extern const int DEBUG_PARSER;
 
 int parser_start(char *buffer) {
+    token_index = 0;
+    // we first check if <? is present
+
+    if (!check_prolog(buffer)) {
+        printf("\x1b[31m" "Error in checking prolog" "\x1b[0m" "\n");
+        return 2;
+    }
+    buffer += strlen(prolog);
+
     token_storage_t *token_storage = token_storage_create();
     int error = dka(buffer, strlen(buffer), token_storage);
 
     // check if there was an error in lexical analysis
+    
+    if (DEBUG_PARSER) {
+        token_t *token = NULL;
+        while ((token = get_token(token_storage)) != NULL) {
+        token_print(token);
+        }
+    }
+    token_index = 0;
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
         return 1;
     }
 
     // check if declare(strict_types=1) is present
-    if (check_strict_types(token_storage)) {
-        printf("[ERROR] An error has occured in syntax analysis %s\n", "\U0001F913");
+    if (rule_program(token_storage)) {
+        printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
         return 2;
     }
 
-    token_t *token = NULL;
-    
-    while ((token = get_token(token_storage)) != NULL) {
-        token_print(token);
-    }
     printf("Number of tokens: %d\n", token_storage->num_tokens);
 
     token_storage_free(token_storage);
@@ -40,6 +55,7 @@ int parser_start(char *buffer) {
 token_t *get_token(token_storage_t *token_storage){
     if (token_index < token_storage->num_tokens) {
         return token_storage->tokens[token_index++];
+
     }
     else {
         // jak si to vedel ty prijebany
@@ -47,42 +63,68 @@ token_t *get_token(token_storage_t *token_storage){
     }
 }
 
-//checking whether prolog is complete
-bool check_strict_types(token_storage_t *token_storage) {
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_ID || strcmp(token->value, "declare") != 0) {
-        return false;
+// check if buffer starts with prolog
+bool check_prolog(char *buffer) {
+    for (size_t i = 0; i < strlen(prolog); i++) {
+        if (buffer[i] != prolog[i]) {
+            return false;
+        }
     }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_SEP || token->value != '(') {
-        return false;
-    }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_ID || strcmp(token->value, "strict_types") != 0) {
-        return false;
-    }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_OP || token->value != '=') {
-        return false;
-    }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_LIT || strcmp(token->value, "1") != 0) {
-        return false;
-    }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_SEP || token->value != ')') {
-        return false;
-    }
-
-    token_t *token = get_token(token_storage);
-    if (token == NULL || token->type != TOK_SEP || token->value != ';') {
-        return false;
-    }
-
     return true;
+}
+//-----------------------------------------------------------------------------------------------------------
+//RULES
+
+//<program>-> <prolog> <stlist> 
+bool rule_program(token_storage_t *token_storage) {
+    return check_strict_types(token_storage); // || stlist(token_storage);
+}
+
+//checking whether prolog is complete
+int check_strict_types(token_storage_t *token_storage) {
+    token_t *token = get_token(token_storage);
+
+    if (token == NULL || token->token_type != TOK_ID || strcmp(token->value, "declare") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in first condition" "\x1b[0m" "\n");
+        printf("%d %d %d\n", token == NULL, token_index, token_storage->num_tokens);
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, "(") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in second condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_ID || strcmp(token->value, "strict_types") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in third condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_OPERATOR || strcmp(token->value, "=") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in fourth condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_LIT || strcmp(token->value, "1") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in fifth condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, ")") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in sixth condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    token = get_token(token_storage);
+    if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, ";") != 0) {
+        if (DEBUG_PARSER) printf("\x1b[31m" "Error in seventh condition" "\x1b[0m" "\n");
+        return 1;
+    }
+
+    return 0;
 }

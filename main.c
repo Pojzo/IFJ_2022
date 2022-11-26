@@ -9,7 +9,12 @@
 
 const int MAX_BUFFER_LEN = 1000;
 
-#define DEBUG
+const int DEBUG_PARSER = 1;
+const int DEBUG_LEXER = 0;
+
+char *get_buffer();
+int run(char *buffer);
+void test_prolog();
 
 // comment the code below
 char *get_buffer() {
@@ -37,40 +42,50 @@ char *get_buffer() {
 
 const char *prolog = "<?php";
 
-
-// check if buffer starts with prolog
-bool check_prolog(char *buffer) {
-    for (int i = 0; i < strlen(prolog); i++) {
-        if (buffer[i] != prolog[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
 int main() {
     char *source = get_buffer();
     if (source == NULL) {
         return 1;
     }
+    // run(source);
+    // free(source);
+    printf("Running prolog tests\n-------------------\n");
+    test_prolog();
+}
+
+int run(char *source) {
     // input source is too short
     if (strlen(source) < strlen(prolog)) {
         return 1;
     }
-
-    if (!(check_prolog(source))) {
-        printf("[ERROR] An error has occured in syntax analysis %s\n", "\U0001F913\n");
-        return 2;
-    }
-
-    //moving prolog out of source
-    char *buffer = source + strlen(prolog);
     
-    int error = parser_start(buffer);
+    int error = parser_start(source);
 
     printf("error value: %d\n", error);
 
-    free(buffer);
     return error;
+}
+
+
+const char *test_programs[] = {
+                                "<?php\ndeclare(strict_types=1);",
+                                "<?php\ndeclare(strict_types=1);",
+                                "<?php declare(strict_types=1);"
+                                "<?php\n\ndeclare(strict_types=1);",
+                                "<?php//komentar\ndeclare(strict_types=1);",
+                                "<?php/*komentar*/declare(strict_types=1);"};
+
+const int num_test_programs = 5;
+
+
+
+// this function is supposed to, in each iteration copy the contents of test_programs[i] to buffer
+void test_prolog() {
+    for (int i = 0; i < num_test_programs; i++) {
+        printf("Buffer: %s\n", test_programs[i]);
+        int result = run((char *) test_programs[i]);
+        assert(result == 0);
+        printf("\x1b[32m" "Test %d passed\n-------------------------------------\n", i + 1);
+        printf("\x1b[0m");
+    }
 }
