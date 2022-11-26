@@ -43,12 +43,15 @@ char *get_buffer() {
 const char *prolog = "<?php";
 
 int main() {
+    /*
     char *source = get_buffer();
     if (source == NULL) {
         return 1;
     }
-    // run(source);
-    // free(source);
+    
+    run(source);
+    free(source);
+    */
     printf("Running prolog tests\n-------------------\n");
     test_prolog();
 }
