@@ -85,8 +85,9 @@ const int num_test_programs = 5;
 // this function is supposed to, in each iteration copy the contents of test_programs[i] to buffer
 void test_prolog() {
     for (int i = 0; i < num_test_programs; i++) {
-        printf("Buffer: %s\n", test_programs[i]);
-        int result = run((char *) test_programs[i]);
+        char *ptr = (char *) test_programs[i];
+        printf("Buffer: %s\n", ptr);
+        int result = run(ptr);
         assert(result == 0);
         printf("\x1b[32m" "Test %d passed\n-------------------------------------\n", i + 1);
         printf("\x1b[0m");

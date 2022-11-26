@@ -110,6 +110,10 @@ void token_storage_free(token_storage_t *token_storage) {
 // ADDED
 // adds token to token array
 void token_storage_add(token_storage_t *token_storage, tok_type token_type, char *start_ptr, int token_value_len) {
+    // static int num_added = 0;
+    // print the text in blue 
+    // then reset to black
+    // printf("\033[0;34m" "Added token: %s - %d\n" "\033[0m", start_ptr, num_added++);
     // create new token
     token_t *token = token_create(token_type, start_ptr, token_value_len);
     if (token == NULL) {
