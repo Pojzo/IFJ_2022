@@ -41,9 +41,15 @@ char *get_buffer() {
     return buffer;
 }
 
-// load stdin to 
-char get_input() {
-    
+// write a function to load standard input into a buffer and return it 
+// (you can use malloc to allocate memory for the buffer)
+// comment the code below
+
+// using the function fgets, read the standard input into a buffer and return it
+char *get_stdin() {
+    char *buffer = malloc(MAX_BUFFER_LEN);
+    fgets(buffer, MAX_BUFFER_LEN, stdin);
+    return buffer;
 }
 
 const char *prolog = "<?php";
@@ -51,12 +57,17 @@ const char *epilog = "?>";
 
 int main() {
     // char *source = get_buffer();
+    /*
     char *source = stdin();
     if (source == NULL) {
         return 1;
     }
-    int error = run(source);
-    free(source);
+    */
+    char *c = get_stdin();
+    printf("%s\n", c);
+    // int error = run(source);
+    int error = 5;
+    free(c);
     /*
     printf("Running prolog tests\n-------------------\n");
     test_prolog();
