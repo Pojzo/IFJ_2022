@@ -10,6 +10,7 @@
 int token_index = 0;
 extern const char *prolog;
 extern const int DEBUG_PARSER;
+extern const char *epilog;
 
 int parser_start(char *buffer) {
     token_index = 0;
@@ -35,7 +36,7 @@ int parser_start(char *buffer) {
     token_index = 0;
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
-        return 1;
+        return error;
     }
 
     // check if declare(strict_types=1) is present
@@ -58,7 +59,6 @@ token_t *get_token(token_storage_t *token_storage){
 
     }
     else {
-        // jak si to vedel ty prijebany
         return NULL;
     }
 }
@@ -72,12 +72,21 @@ bool check_prolog(char *buffer) {
     }
     return true;
 }
+
+bool check_epilog(char *buffer) {
+    for (size_t i = 0; i < strlen(epilog); i++) {
+        if (buffer[i] != epilog[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 //-----------------------------------------------------------------------------------------------------------
 //RULES
 
 //<program>-> <prolog> <stlist> 
 bool rule_program(token_storage_t *token_storage) {
-    return check_strict_types(token_storage); // || stlist(token_storage);
+    return check_strict_types(token_storage); // || rule_stlist(token_storage);
 }
 
 //checking whether prolog is complete
@@ -128,3 +137,25 @@ int check_strict_types(token_storage_t *token_storage) {
 
     return 0;
 }
+
+/*
+bool rule_stlist(token_storage_t *token_storage) {
+    token_t *token = get_token(token_storage);
+    //<stlist> -> <EOF> 
+    if (token == NULL);
+        retrun 0;
+    //<stlist> -> <epilog> 
+    if(token->token_type == TOK_EPILOG );
+        return 0;
+    //<stlist> -> <statement> <stlist>
+    if (rule_st(token)) {
+        if (stlist(token_storage)) {
+            return 0;
+        }
+        return 1;
+    }
+    return 1;
+}
+
+bool rule_st()
+*/

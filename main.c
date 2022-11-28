@@ -12,6 +12,7 @@ const int MAX_BUFFER_LEN = 1000;
 const int DEBUG_PARSER = 1;
 const int DEBUG_LEXER = 0;
 
+
 char *get_buffer();
 int run(char *buffer);
 void test_prolog();
@@ -41,19 +42,19 @@ char *get_buffer() {
 }
 
 const char *prolog = "<?php";
+const char *epilog = "?>";
 
 int main() {
-    /*
     char *source = get_buffer();
     if (source == NULL) {
         return 1;
     }
-    
     run(source);
     free(source);
-    */
+    /*
     printf("Running prolog tests\n-------------------\n");
     test_prolog();
+    */
 }
 
 int run(char *source) {

@@ -10,7 +10,7 @@
 
 extern const int DEBUG_LEXER;
 
-const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL"};
+const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARATOR", "TOK_OPERATOR", "TOK_LITERAL", "TOK_EPILOG"};
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *string_operators[] = {"===", "!==", ">=", "<="};
@@ -23,6 +23,8 @@ const int string_oper_len = 4;
 const int keywords_len = 10;
 
 int buffer_read_len = 0;
+extern const char *epilog;
+
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
@@ -140,7 +142,7 @@ char *start_ptr;
 int dka(char *source, int source_len, token_storage_t *token_storage) {
     state current_state = STATE_START;
     start_ptr = source;
-    while (i <= source_len) {
+    while (i < source_len) {
         char current_char = source[i];
         switch (current_state) {
             case STATE_START:
@@ -407,6 +409,26 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_STR;
                 }
                 break;
+            
+            case STATE_EPILOG:
+            // ?..
+                if (current_char == '>') {
+                    token_storage_add(token_storage, TOK_EPILOG, start_ptr, token_value_len);
+                    current_state = STATE_EPILOG_2;
+                    i++;
+                }
+                else {
+                    current_state = STATE_ERROR;
+                }
+                break;
+
+            case STATE_EPILOG_2:
+            // ?>..
+                if (i + 1== source_len) {
+                    return 0;
+                }
+                printf("i == %d, source_len == %d", i, source_len);
+                return 2;
 
             case STATE_TERMINATE:
             return 0;
@@ -485,6 +507,11 @@ state state_start(char c){
         i++;
         token_value_len++;
         return STATE_LIT_STR;
+    }
+    else if (c == '?') {
+        token_value_len++;
+        i++;
+        return STATE_EPILOG;
     }
     else if (c == '\0') {
         return STATE_TERMINATE;

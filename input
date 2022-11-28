@@ -1,2 +1,5 @@
 <?php
 declare(strict_types=1);
+$a = 5.5;
+$b = -5.555.4444;
+?>
