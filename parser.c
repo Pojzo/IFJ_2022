@@ -45,7 +45,7 @@ int parser_start(char *buffer) {
         return 2;
     }
 
-    printf("Number of tokens: %d\n", token_storage->num_tokens);
+    // printf("Number of tokens: %d\n", token_storage->num_tokens);
 
     token_storage_free(token_storage);
 

@@ -9,7 +9,7 @@
 
 const int MAX_BUFFER_LEN = 1000;
 
-const int DEBUG_PARSER = 1;
+const int DEBUG_PARSER = 0;
 const int DEBUG_LEXER = 0;
 
 
@@ -34,27 +34,34 @@ char *get_buffer() {
     }
     buffer[i] = ' ';
     buffer[i+1] = '\0';
-    printf("%s\n", buffer);
-    printf("%d\n", (int)strlen(buffer));
+    // printf("%s\n", buffer);
+    // printf("%d\n", (int)strlen(buffer));
     fclose(fp);
 
     return buffer;
+}
+
+// load stdin to 
+char get_input() {
+    
 }
 
 const char *prolog = "<?php";
 const char *epilog = "?>";
 
 int main() {
-    char *source = get_buffer();
+    // char *source = get_buffer();
+    char *source = stdin();
     if (source == NULL) {
         return 1;
     }
-    run(source);
+    int error = run(source);
     free(source);
     /*
     printf("Running prolog tests\n-------------------\n");
     test_prolog();
     */
+    return error;
 }
 
 int run(char *source) {
@@ -65,11 +72,10 @@ int run(char *source) {
     
     int error = parser_start(source);
 
-    printf("error value: %d\n", error);
+    // printf("error value: %d\n", error);
 
     return error;
 }
-
 
 const char *test_programs[] = {
                                 "<?php\ndeclare(strict_types=1);",
@@ -87,10 +93,10 @@ const int num_test_programs = 5;
 void test_prolog() {
     for (int i = 0; i < num_test_programs; i++) {
         char *ptr = (char *) test_programs[i];
-        printf("Buffer: %s\n", ptr);
+        // printf("Buffer: %s\n", ptr);
         int result = run(ptr);
         assert(result == 0);
-        printf("\x1b[32m" "Test %d passed\n-------------------------------------\n", i + 1);
-        printf("\x1b[0m");
+        // printf("\x1b[32m" "Test %d passed\n-------------------------------------\n", i + 1);
+        // printf("\x1b[0m");
     }
 }

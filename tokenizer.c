@@ -375,7 +375,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_NUM_FLOAT;
                 }
                 else {
-                    printf("Token value len: %d start_pointer: %c, current_char: %c\n", token_value_len, *start_ptr, current_char);
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
                 }
