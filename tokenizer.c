@@ -25,6 +25,7 @@ const int keywords_len = 10;
 int buffer_read_len = 0;
 extern const char *epilog;
 
+bool terminated_string = false;
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
@@ -369,6 +370,11 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                     current_state = STATE_LIT_NUM;
                 }
+                else if (current_char == 'e' || current_char == 'E') {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM_FLOAT_E;
+                }
                 else if (current_char == '.') {
                     token_value_len++;
                     i++;
@@ -379,6 +385,40 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_START;
                 }
                 break;
+
+            case STATE_LIT_NUM_FLOAT_E:
+                // 1e..
+                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT_E", start_ptr, token_value_len);
+                if (current_char == '+' || current_char == '-') {
+                    token_value_len++;
+                    i++;
+                }
+                current_state = STATE_LIT_NUM_FLOAT_E_2;
+                break;
+
+            case STATE_LIT_NUM_FLOAT_E_2:
+                if (is_digit(current_char)) {
+                    i++;
+                    token_value_len++;
+                    current_state = STATE_LIT_NUM_FLOAT_E_3;
+                }
+                else {
+                    current_state = STATE_ERROR;
+                }
+                break;
+            case STATE_LIT_NUM_FLOAT_E_3:
+                // 1e(+-)..
+                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT_E_2", start_ptr, token_value_len);
+                if (is_digit(current_char)) {
+                    i++;
+                    token_value_len++;
+                    current_state = STATE_LIT_NUM_FLOAT_E_2;
+                }
+                else {
+                    current_state = STATE_START;
+                }
+                break;
+
             case STATE_LIT_NUM_FLOAT:
             // 123.123...
                 if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT", start_ptr, token_value_len);
@@ -396,6 +436,12 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             
             case STATE_LIT_STR:
             // "..
+                if (i + 1 == source_len) {
+                    if (current_char != '"') {
+                        return 1;
+                    }
+                }
+
                 if (DEBUG_LEXER) debug_print_state("STATE_LIT_STR", start_ptr, token_value_len);
                 if (current_char == '"') {
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
