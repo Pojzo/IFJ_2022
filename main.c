@@ -46,9 +46,18 @@ char *get_buffer() {
 // comment the code below
 
 // using the function fgets, read the standard input into a buffer and return it
+// account for new lines, get the whole input
 char *get_stdin() {
     char *buffer = malloc(MAX_BUFFER_LEN);
-    fgets(buffer, MAX_BUFFER_LEN, stdin);
+    char c;
+    int i = 0;
+    while ((c = fgetc(stdin)) != EOF) {
+        buffer[i++] = c;
+    }
+    buffer[i] = ' ';
+    buffer[i+1] = '\0';
+    // printf("%s\n", buffer);
+    // printf("%d\n", (int)strlen(buffer));
     return buffer;
 }
 
