@@ -62,6 +62,17 @@ token_t *get_token(token_storage_t *token_storage){
         return NULL;
     }
 }
+token_t *get_token_keep(token_storage_t *token_storage){
+    if (token_index < token_storage->num_tokens) {
+        return token_storage->tokens[token_index];
+
+    }
+    else {
+        return NULL;
+    }
+}
+
+
 
 // check if buffer starts with prolog
 bool check_prolog(char *buffer) {
@@ -86,7 +97,7 @@ bool check_epilog(char *buffer) {
 
 //<program>-> <prolog> <stlist> 
 bool rule_program(token_storage_t *token_storage) {
-    return check_strict_types(token_storage); // || rule_stlist(token_storage);
+    return check_strict_types(token_storage) || rule_stlist(token_storage);
 }
 
 //checking whether prolog is complete
@@ -138,24 +149,319 @@ int check_strict_types(token_storage_t *token_storage) {
     return 0;
 }
 
-/*
 bool rule_stlist(token_storage_t *token_storage) {
     token_t *token = get_token(token_storage);
     //<stlist> -> <EOF> 
-    if (token == NULL);
-        retrun 0;
-    //<stlist> -> <epilog> 
-    if(token->token_type == TOK_EPILOG );
-        return 0;
-    //<stlist> -> <statement> <stlist>
-    if (rule_st(token)) {
-        if (stlist(token_storage)) {
-            return 0;
-        }
+    if (token == NULL)
         return 1;
+    //<stlist> -> <epilog> 
+    if(token->token_type == TOK_EPILOG )
+        return 1;
+    //<stlist> -> <statement> <stlist>
+    if (rule_st(token_storage)) {
+        if (rule_stlist(token_storage)) {
+            return 1;
+        }
+        return 0;
     }
-    return 1;
+    return 0;
 }
 
-bool rule_st()
+bool term_if(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "if") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+
+bool term_while(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "while") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_open_bracket(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "(") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_close_bracket(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, ")") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_open_curly_bracket(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "{") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_close_curly_bracket(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "}") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_else(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_function(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "function") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_equals(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "=") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_semicolon(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, ";") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_colon(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, ":") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_comma(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, ",") == 0) {
+        token = get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_id(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_ID && (token->value)[0] == '$') {
+        get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_idfun(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+   if (token != NULL && token->token_type == TOK_ID && (token->value)[0] != '$') {
+        get_token(token_storage);
+        return 1;
+    }
+    return 0;
+}
+
+bool term_type(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token != NULL && token->token_type == TOK_KEYWORD) {
+        if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0){
+            token = get_token(token_storage);
+            return 1;
+        }    
+    }
+    return 0;
+}
+
+bool rule_st(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (term_while(token_storage) && term_open_bracket(token_storage) && rule_expr(token_storage) && 
+        term_close_bracket(token_storage) && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
+        return 1;
+    }
+    if (term_if(token_storage) && term_open_bracket(token_storage) && rule_expr(token_storage) && 
+        term_close_bracket(token_storage) && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
+        if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0){
+            get_token(token_storage);
+            if (rule_else(token_storage)) {
+                return 1;      
+            }
+        }
+        else {
+            return 1;
+        }
+    }
+
+    if (term_idfun(token_storage) && term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
+        return 1;
+    }
+
+    if (term_id(token_storage) && term_equals(token_storage) && rule_expr(token_storage) && 
+    term_semicolon(token_storage)) {
+        return 1;
+    }
+    return 0;
+
+
+
+    /*
+    token_t *token = get_token_keep(token_storage);
+    // if
+    if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "if") == 0) {
+        token = get_token(token_storage);
+        // if (
+        if (token != NULL && token->token_type == TOK_SEPARATOR && strcmp(token->value, "(") == 0) {
+            token = get_token(token_storage);
+            // if (expr
+            if (rule_expr(token_storage)) {
+                token = get_token(token_storage);
+                // if (expr)
+                if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, ")") == 0) {
+                    token = get_token(token_storage)
+                    if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, "{") == 0) {
+                        if (rule_fstlist(token_storage)) {
+                            token = get_token(token_storage);
+                            if (token != NULL && token->token_type == TOKEN_KEYWORD && strcmp(token->value, "else") == 0){
+                                if (rule_else(token_storage)) {
+                                    return 1;      
+                                }
+                            }
+                            else {
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "while") == 0) {
+        token = get_token(token_storage);
+        // if (
+        if (token != NULL && token->token_type == TOK_SEPARATOR && strcmp(token->value, "(") == 0) {
+            token = get_token(token_storage);
+            // if (expr
+            if (rule_expr(token_storage)) {
+                token = get_token(token_storage);
+                // if (expr)
+                if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, ")") == 0) {
+                    token = get_token(token_storage)
+                    if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, "{") == 0) {
+                        token = get_token(token_storage);
+                        if (rule_fstlist(token_storage)) {
+                            return 1;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    else if (token != NULL && token->token_type == TOK_ID && (token->value)[i] != '$') {
+        token_t *token = get_token(token_storage);
+        if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, "(") == 0) {
+            if (rule_funccallarg(token_storage)) {
+                return 1;
+            }
+        }
+    }
+    else if (token != NULL && token->token_type == TOK_ID && (token->value)[i] == '$') {
+        token_t *token = get_token(token_storage);
+        if (token != NULL && token->token_type == TOKEN_OPERATOR && strcmp(token->value, "=") == 0) {
+            token_t *token = get_token(token_storage);
+            if (rule_expr(token_storage)) {
+                token_t *token = get_token(token_storage);
+                if (token != NULL && token->token_type == TOKEN_SEPARATOR && strcmp(token->value, ";") == 0){
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+    */    
+}
+
+bool rule_fstlist(token_storage_t *token_storage) {
+    if (term_close_curly_bracket(token_storage)) {
+        return 1;
+    }
+    if (rule_st(token_storage) && rule_fstlist(token_storage)) {
+        return 1;
+    }
+    return 0;
+  
+    /*
+    if (token != NULL && token->token_type == TOK_SEPARATOR && strcmp(token->value, "}") == 0) {
+        return 1;
+    }
+    token_t *token = get_token(token_storage);
+    if (rule_st(token)) {
+        token_t *token = get_token(token_storage);
+        if (rule_fstlist(token_storage)) {
+            return 1;
+        }
+
+    }
+    return 0;
 */
+}
+
+bool rule_else (token_storage_t *token_storage) {
+    if (term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
+        return 1;
+    }
+    return 0;
+}
+
+bool rule_funccallarg (token_storage_t *token_storage) {
+    if (term_close_bracket(token_storage)) {
+        return 1;
+    }
+    if (rule_expr(token_storage) && rule_next(token_storage)) {
+        return 1;
+    }
+    return 0;
+}
+
+bool rule_next (token_storage_t *token_storage) {
+    if (term_close_bracket(token_storage)) {
+        return 1;
+    }
+    if(term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage)){
+        return 1;
+    }
+    return 0;
+}
+

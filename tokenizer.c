@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// cigani su dobri...
-//oops
+
 
 #include "tokenizer.h"
 #include "utils.h"
@@ -26,6 +25,8 @@ int buffer_read_len = 0;
 extern const char *epilog;
 
 bool terminated_string = false;
+
+//static inline const unsigned char a = 0;
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
