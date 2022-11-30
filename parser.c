@@ -41,7 +41,7 @@ int parser_start(char *buffer) {
     }
 
     else {
-        printf("Lexical analysis was successful\n");
+        printf("\nLexical analysis was successful\n");
     }
 
     // check if declare(strict_types=1) is present
