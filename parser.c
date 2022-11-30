@@ -324,7 +324,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
     
     if (term_if(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_cond(token_storage) 
+        if (term_open_bracket(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
                 get_token(token_storage);
@@ -452,20 +452,6 @@ bool rule_function_body(token_storage_t* token_storage) {
     return 0;
 }
 
-bool rule_cond(token_storage_t* token_storage) {
-    return rule_expr(token_storage) && rule_cond_end(token_storage);
-}
-
-bool rule_cond_end(token_storage_t* token_storage) {
-    if (term_close_bracket(token_storage)) {
-        return 1;
-    }
-    if (term_cond_op(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)) {
-        return 1;
-    }
-    return 0;
-    
-}
 
 
 bool rule_return_cond(token_storage_t* token_storage) {
@@ -473,39 +459,7 @@ bool rule_return_cond(token_storage_t* token_storage) {
         return 1;
     }
             
-    if (rule_expr(token_storage) && rule_return_cond_end(token_storage)) {
-        return 1;
-    }
-    return 0;
-}
-
-bool rule_return_cond_end(token_storage_t* token_storage) {
-    if (term_semicolon(token_storage)) {
-        return 1;
-    }
-    if (term_cond_op(token_storage) && rule_expr(token_storage) && term_semicolon(token_storage)) {
-        return 1;
-    }
-    return 0;
-    
-}
-
-
-bool term_cond_op(token_storage_t *token_storage) {
-    token_t *token = get_token_keep(token_storage);
-    if (token == NULL) {
-        return 0;
-    }
-    if (arr_contains_str(string_operators, token->value, string_oper_len)) {
-        get_token(token_storage);
-        return 1;
-    }
-    if (strcmp(token->value, "<") == 0) {
-        get_token(token_storage);
-        return 1;
-    }
-    if (strcmp(token->value, ">") == 0) {
-        get_token(token_storage);
+    if (rule_expr(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
