@@ -15,7 +15,7 @@ const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *string_operators[] = {"===", "!==", ">=", "<="};
 const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
 const char separators[] = {' ', ':', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
-token_t *tokens;
+token_t *tokens; 
 const int separ_len = 12;
 const int oper_len = 9;
 const int string_oper_len = 4;

@@ -1,8 +1,12 @@
 <?php
 declare(strict_types=1);
-function zopid(int $gazdik, string $davidko) : intc{
-    function gazdik(int $pojzo) : strimg {
-        
+function zopid(int $gazdik, string $davidko) : int {
+    if ($x === $y) {
+        return;
+        return 5;
+        return $gazdik === $cmorik;
+        return $gazdik < $cmorik;
+        return $gazdik >= $cmorik;
+        return $gazdik <= $cmorik;
     }
 }
- 

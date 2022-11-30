@@ -9,7 +9,7 @@
 
 const int MAX_BUFFER_LEN = 1000;
 
-const int DEBUG_PARSER = 0;
+const int DEBUG_PARSER = 1;
 const int DEBUG_LEXER = 0;
 
 
@@ -65,15 +65,9 @@ const char *prolog = "<?php";
 const char *epilog = "?>";
 
 int main() {
-    /*
-    char *source = get_buffer();
 
-    if (source == NULL) {
-        return 1;
-    }
-    */
-       
-    char *source = get_stdin();
+    char *source = get_buffer();
+    //char *source = get_stdin();
     printf("%s", source);
     int error = run(source);
     free(source);

@@ -36,6 +36,12 @@ bool rule_function_arguments(token_storage_t *token_storage);
 bool rule_argf(token_storage_t *token_storage);
 bool rule_more_argf(token_storage_t *token_storage);
 bool rule_function_body(token_storage_t* token_storage);
+bool rule_cond(token_storage_t* token_storage);
+bool rule_cond_end(token_storage_t* token_storage);
+bool term_cond_op(token_storage_t *token_storage);
+bool rule_return_cond(token_storage_t* token_storage);
+bool rule_return_cond_end(token_storage_t* token_storage);
+
 
 
 #endif
