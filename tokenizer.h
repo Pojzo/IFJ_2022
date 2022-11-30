@@ -52,11 +52,9 @@ state state_keyword_start(char c);
 state state_keyword_main(char c);
 state state_is_keyword(char *start_ptr, int token_value_len);
 
-// test states
+token_t *get_token(token_storage_t *token_storage);
+token_t *get_token_keep(token_storage_t *token_storage);
 
-void test_state_start();
-void test_state_id_start();
-void test_state_id_main();
-void test_states();
+
 
 #endif

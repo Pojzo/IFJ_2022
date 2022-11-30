@@ -23,6 +23,7 @@ const int keywords_len = 10;
 
 int buffer_read_len = 0;
 extern const char *epilog;
+extern int token_index;
 
 bool terminated_string = false;
 
@@ -591,4 +592,25 @@ state state_keyword_main(char c) {
         return STATE_KEYWORD; 
     }
     return STATE_ERROR;
+}
+
+
+// get the next token from token_storage
+token_t *get_token(token_storage_t *token_storage){
+    if (token_index < token_storage->num_tokens) {
+        return token_storage->tokens[token_index++];
+
+    }
+    else {
+        return NULL;
+    }
+}
+token_t *get_token_keep(token_storage_t *token_storage){
+    if (token_index < token_storage->num_tokens) {
+        return token_storage->tokens[token_index];
+
+    }
+    else {
+        return NULL;
+    }
 }

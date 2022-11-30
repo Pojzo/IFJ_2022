@@ -5,6 +5,7 @@
 
 #include "tokenizer.h"
 #include "parser.h"
+#include "expression.h"
 
 
 int token_index = 0;
@@ -39,6 +40,10 @@ int parser_start(char *buffer) {
         return error;
     }
 
+    else {
+        printf("Lexical analysis was successful\n");
+    }
+
     // check if declare(strict_types=1) is present
     if (rule_program(token_storage)) {
         printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
@@ -50,26 +55,6 @@ int parser_start(char *buffer) {
     token_storage_free(token_storage);
 
     return error;
-}
-
-// get the next token from token_storage
-token_t *get_token(token_storage_t *token_storage){
-    if (token_index < token_storage->num_tokens) {
-        return token_storage->tokens[token_index++];
-
-    }
-    else {
-        return NULL;
-    }
-}
-token_t *get_token_keep(token_storage_t *token_storage){
-    if (token_index < token_storage->num_tokens) {
-        return token_storage->tokens[token_index];
-
-    }
-    else {
-        return NULL;
-    }
 }
 
 
