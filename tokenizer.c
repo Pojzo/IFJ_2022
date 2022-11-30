@@ -598,6 +598,7 @@ state state_keyword_main(char c) {
 // get the next token from token_storage
 token_t *get_token(token_storage_t *token_storage){
     if (token_index < token_storage->num_tokens) {
+        printf("%s\n", token_storage->tokens[token_index]->value);
         return token_storage->tokens[token_index++];
 
     }
