@@ -25,6 +25,9 @@ int buffer_read_len = 0;
 extern const char *epilog;
 extern int token_index;
 
+extern const int DEBUG_PARSER;
+
+
 bool terminated_string = false;
 
 //static inline const unsigned char a = 0;
@@ -598,7 +601,7 @@ state state_keyword_main(char c) {
 // get the next token from token_storage
 token_t *get_token(token_storage_t *token_storage){
     if (token_index < token_storage->num_tokens) {
-        printf("%s\n", token_storage->tokens[token_index]->value);
+        if (DEBUG_PARSER) printf("%s\n", token_storage->tokens[token_index]->value);
         return token_storage->tokens[token_index++];
 
     }

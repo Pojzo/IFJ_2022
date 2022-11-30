@@ -37,7 +37,7 @@ int parser_start(char *buffer) {
     token_index = 0;
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
-        return error;
+        return 1;
     }
 
     else {
@@ -58,7 +58,7 @@ int parser_start(char *buffer) {
 
     token_storage_free(token_storage);
 
-    return error;
+    return 0;
 }
 
 
