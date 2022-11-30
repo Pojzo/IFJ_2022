@@ -50,6 +50,10 @@ int parser_start(char *buffer) {
         return 2;
     }
 
+    else {
+        printf("Syntax analysis was successful(bola ne)\n");
+    }
+
     // printf("Number of tokens: %d\n", token_storage->num_tokens);
 
     token_storage_free(token_storage);
