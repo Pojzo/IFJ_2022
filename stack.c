@@ -24,3 +24,4 @@ void stack_free(stack_t *stack) {
 void stack_node_free(stack_node_t *node) {
     free(node);
 }
+

@@ -31,6 +31,11 @@ bool term_comma(token_storage_t *token_storage);
 bool term_id(token_storage_t *token_storage);
 bool term_idfun(token_storage_t *token_storage);
 bool term_type(token_storage_t *token_storage);
+bool rule_fdef (token_storage_t *token_storage);
+bool rule_function_arguments(token_storage_t *token_storage);
+bool rule_argf(token_storage_t *token_storage);
+bool rule_more_argf(token_storage_t *token_storage);
+bool rule_function_body(token_storage_t* token_storage);
 
 
 #endif
