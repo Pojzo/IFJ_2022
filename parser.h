@@ -11,7 +11,6 @@ bool check_prolog(char *buffer);
 bool rule_program(token_storage_t *token_storage);
 bool rule_st(token_storage_t *token_storage);
 bool rule_stlist(token_storage_t *token_storage);
-bool rule_expr(token_storage_t *token_storage);
 bool rule_fstlist(token_storage_t *token_storage);
 bool rule_else(token_storage_t *token_storage);
 bool rule_funccallarg(token_storage_t *token_storage);

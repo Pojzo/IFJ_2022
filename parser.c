@@ -316,7 +316,7 @@ bool term_type(token_storage_t *token_storage) {
 bool rule_st(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
     if (term_while(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage) && 
+        if (term_open_bracket(token_storage) && rule_expr(token_storage, true) && 
                term_close_bracket(token_storage) && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             return 1;
         }
@@ -324,7 +324,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
     
     if (term_if(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)
+        if (term_open_bracket(token_storage) && rule_expr(token_storage, true) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
                 get_token(token_storage);
@@ -350,7 +350,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
-        if( term_equals(token_storage) && rule_expr(token_storage) && 
+        if( term_equals(token_storage) && rule_expr(token_storage, false) && 
         term_semicolon(token_storage)) {
             return 1;
         }
@@ -387,7 +387,7 @@ bool rule_funccallarg (token_storage_t *token_storage) {
     if (term_close_bracket(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
-    if (rule_expr(token_storage) && rule_next(token_storage) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage, true) && rule_next(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
@@ -397,7 +397,7 @@ bool rule_next (token_storage_t *token_storage) {
     if (term_close_bracket(token_storage)) {
         return 1;
     }
-    if(term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage)) {
+    if(term_comma(token_storage) && rule_expr(token_storage, true) && rule_next(token_storage)) {
         return 1;
     }
     return 0;
@@ -453,13 +453,12 @@ bool rule_function_body(token_storage_t* token_storage) {
 }
 
 
-
 bool rule_return_cond(token_storage_t* token_storage) {
     if (term_semicolon(token_storage)) {
         return 1;
     }
             
-    if (rule_expr(token_storage) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage, false) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
