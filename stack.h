@@ -5,17 +5,13 @@
 typedef struct Stack {
     int top;
     int capacity;
-    int *array;
+    token_t *array;
 } stack_t;
 
-typedef struct Stack_Node {
-    token_t *token;
-} stack_node_t;
-
 stack_t *stack_init(int capacity);
-stack_node_t *stack_node_init(int data);
-
 void stack_free(stack_t *stack);
-void stack_node_free(stack_node_t *node);
+
+void stack_push(stack_t *stack, token_t *token);
+token_t *stack_pop(stack_t *stack);
 
 #endif

@@ -16,7 +16,7 @@ typedef enum {
 
 #define N 8
 
-int prec_table[N][N] =
+const int prec_table[N][N] =
 {
 //	  |*/ | +-.  | <>  | === | (    | )   | i  | $ |
 	{ L_A , L_A , L_A , L_A , R_A , L_A , R_A , L_A }, /// */
@@ -30,18 +30,56 @@ int prec_table[N][N] =
 };
 
 
+
+int left_brackets = 0;
 bool rule_expr(token_storage_t *token_storage, bool if_while) {
-    (void) token_storage;
-    (void) if_while;
+    bool input_end = false;
+    left_brackets = 0;
+    char *input;
+    char *stack_top;
+    while (true) {
+        if (input_end == 0) {
+            token_t *cur_token = get_token_keep();
+            if (cur_token->token_type == TOK_OPERATOR && strcmp(cur_token->value, "(") == 0) {
+                left_brackets++;
+            }
+
+            else if(cur_token->token_type == TOK_OPERATOR && strcmp(cur_token->value, ")") == 0) {
+                if (left_brackets == 0) {
+                    input_end = 1;
+                    continue;
+                }
+            }
+
+            input = "(";
+        }
+
+        else {
+            input = '$';
+        }
+        
+    }
+
+    while (true)  { // stack != $S
+
+    }
+
     return true;
 } 
 
-int convert_operator(token_t *token) {
+// -1 je error (je ne?)
+int convert_operator(token_t *token, bool if_while) {
+    if (token == NULL) {
+        return 7;
+    }
+
     if (((token->token_type == TOK_ID) && (token->value[0] == '$')) || token->token_type == TOK_LIT) {
         return 6;
     }
 
     if(token->token_type == TOK_ID) {
+        // toto je funkcia
+        // takze s tym nieco este budeme musiet spravit
         return 10;
     }
 
@@ -73,5 +111,5 @@ int convert_operator(token_t *token) {
             return 3;
         }
     }
-    return 7;
+    return -1;
 }
