@@ -10,5 +10,5 @@ main: main.o bst.o
 bst.o: bst.c
 	$(CC) $(FLAGS) -c bst.c
 
-tokenizer: main.c tokenizer.c tokenizer.h utils.c utils.h symtable.c symtable.h parser.c parser.h expression.c expression.h
-	$(CC) $(FLAGS) main.c tokenizer.c tokenizer.h utils.c symtable.c parser.c expression.c -o tokenizer
+tokenizer: main.c tokenizer.c tokenizer.h utils.c utils.h parser.c parser.h expression.c expression.h list.c list.h
+	$(CC) $(FLAGS) main.c tokenizer.c tokenizer.h utils.c parser.c expression.c list.c -o tokenizer

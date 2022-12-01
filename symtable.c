@@ -2,6 +2,34 @@
 #include <stdlib.h>
 #include "symtable.h"
 
+
+void id_node_init(id_node_t **node){
+    *node = NULL;
+}
+
+//inserting function
+void insert_function_id(id_node **node, char* name, data_type return_type, data_type **arguments ){
+    //if inserting root
+    if ((*node) == NULL){
+        *node = malloc(sizeof(id_node_t));
+        if((*node == NULL)){
+            return;
+        }
+        (*node)->name = name;
+        (*node)->left = NULL;
+        (*node)->right = NULL;
+        (*node)->return_type = return_type;
+        (*node)->arguments = arguments;
+    }
+    if((*node)->name > name)
+
+    
+}
+
+//create a function that will calculate ascii value of a string
+
+
+
 /*
 node_t *node_create(char *key, char *value) {
     node_t *node = (node_t *) malloc(sizeof(node_t));

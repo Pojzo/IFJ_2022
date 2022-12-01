@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "expression.h"
-#include "stack.h"
 #include "tokenizer.h"
+#include "list.h"
 
 typedef enum {
     L_A, // left association >
@@ -31,44 +31,82 @@ const int prec_table[N][N] =
 
 
 
-int left_brackets = 0;
 bool rule_expr(token_storage_t *token_storage, bool if_while) {
-    bool input_end = false;
-    left_brackets = 0;
-    char *input;
-    char *stack_top;
-    while (true) {
-        if (input_end == 0) {
-            token_t *cur_token = get_token_keep();
-            if (cur_token->token_type == TOK_OPERATOR && strcmp(cur_token->value, "(") == 0) {
+    (void) if_while;
+    int left_brackets = 0;
+    list_t *list = list_init();
+    list_insert_first(&list, DOLLAR);
+    symbol_enum input;
+    symbol_enum top;
+    int row, column;
+    bool input_loaded = false;
+    while (true) { //TODO 
+        if (!input_loaded) {
+            token_t *token = get_token_keep(token_storage);
+            if (strcmp(token->value, "(") == 0) {
                 left_brackets++;
             }
 
-            else if(cur_token->token_type == TOK_OPERATOR && strcmp(cur_token->value, ")") == 0) {
-                if (left_brackets == 0) {
-                    input_end = 1;
-                    continue;
+            else if (strcmp(token->value, ")") == 0) {
+                left_brackets--;
+                if (left_brackets < 0) {
+                    input_loaded = true;
                 }
             }
-
-            input = "(";
+            //MAKE SYMBOL OUT OF TOKEN 
+            top = list_get_first_term(list);
+            row = convert_symbol(top);
+            column = convert_operator(token);
         }
-
         else {
-            input = '$';
+            input = DOLLAR;
+            top = list_get_first_term(list);
+            row = convert_symbol(top);
         }
-        
     }
-
-    while (true)  { // stack != $S
-
-    }
-
-    return true;
+    (void) input;
+    (void) row;
+    (void) column;
 } 
 
+int convert_symbol(symbol_enum symbol) {
+    switch(symbol) {
+        case MUL:
+        case DIV:
+            return 0;
+        case ADD:
+        case SUB:
+        case CONC:
+            return 1;
+        case GT:
+        case LT:
+        case GTE:
+        case LTE:
+            return 2;
+        case NEQ:
+        case EQ:
+            return 3;
+        case OPENBR:
+            return 4;
+        case CLOSEDBR:
+            return 5;
+        case INT:
+        case FLOAT:
+        case STRING:
+            return 6;
+        case DOLLAR:
+            return 7;
+        case STOP:
+            return -1;
+        case NONTERM:
+            return -1;
+    }
+    return -1;
+}
+
 // -1 je error (je ne?)
-int convert_operator(token_t *token, bool if_while) {
+int convert_operator(token_t *token) {
+
     if (token == NULL) {
         return 7;
     }
