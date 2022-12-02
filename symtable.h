@@ -1,6 +1,6 @@
 #ifndef SYMTABLE_H
 #define SYMTABLE_H
-
+#include <stdbool.h>
 // symbol table using a binary tree structure
 
 typedef enum {INT, FLOAT, STRING, VOID} data_type;

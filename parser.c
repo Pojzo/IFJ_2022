@@ -22,6 +22,7 @@ char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak,
 
 
 int parser_start(char *buffer) {
+    printf("som tu \n");
     token_index = 0;
     // we first check if <? is present
 
@@ -124,7 +125,7 @@ int check_strict_types(token_storage_t *token_storage) {
         if (DEBUG_PARSER) printf("\x1b[31m" "Error in fourth condition" "\x1b[0m" "\n");
         return 0;
     }
-
+    
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_LIT || strcmp(token->value, "1") != 0) {
         if (DEBUG_PARSER) printf("\x1b[31m" "Error in fifth condition" "\x1b[0m" "\n");
@@ -296,9 +297,13 @@ bool term_id(token_storage_t *token_storage) {
     return 0;
 }
 
-bool term_idfun(token_storage_t *token_storage) {
+bool term_idfun(token_storage_t *token_storage, bool is_fdef) {
     token_t *token = get_token_keep(token_storage);
    if (token != NULL && token->token_type == TOK_ID && (token->value)[0] != '$') {
+        if(is_fdef) {
+            scope = token->value;
+             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
+        }
         get_token(token_storage);
         return 1;
     }
@@ -320,7 +325,7 @@ bool term_type(token_storage_t *token_storage) {
 bool rule_st(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
     if (term_while(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage, true) && 
+        if (term_open_bracket(token_storage) && rule_expr(token_storage) && 
                term_close_bracket(token_storage) && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             return 1;
         }
@@ -328,7 +333,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
     
     if (term_if(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage, true) && term_close_bracket(token_storage)
+        if (term_open_bracket(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
                 get_token(token_storage);
@@ -344,7 +349,7 @@ bool rule_st(token_storage_t *token_storage) {
         return 0;
     }
 
-    if (term_idfun(token_storage)) {
+    if (term_idfun(token_storage, 0)) {
         if(term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
             return 1;
         }
@@ -354,7 +359,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
-        if( term_equals(token_storage) && rule_expr(token_storage, false) && 
+        if( term_equals(token_storage) && rule_expr(token_storage) && 
         term_semicolon(token_storage)) {
             return 1;
         }
@@ -391,7 +396,7 @@ bool rule_funccallarg (token_storage_t *token_storage) {
     if (term_close_bracket(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
-    if (rule_expr(token_storage, true) && rule_next(token_storage) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage) && rule_next(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
@@ -401,7 +406,7 @@ bool rule_next (token_storage_t *token_storage) {
     if (term_close_bracket(token_storage)) {
         return 1;
     }
-    if(term_comma(token_storage) && rule_expr(token_storage, true) && rule_next(token_storage)) {
+    if(term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage)) {
         return 1;
     }
     return 0;
@@ -409,9 +414,11 @@ bool rule_next (token_storage_t *token_storage) {
 
 bool rule_fdef (token_storage_t *token_storage) {
     if (term_function(token_storage)) {
-        if (term_idfun(token_storage) && term_open_bracket(token_storage) && rule_function_arguments(token_storage) && 
+        if (term_idfun(token_storage, true) && term_open_bracket(token_storage) && rule_function_arguments(token_storage) && 
             term_colon(token_storage) && term_type(token_storage) && term_open_curly_bracket(token_storage) &&
             rule_function_body(token_storage)) {
+            scope = "global";
+             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
             return 1;
         }
     }
@@ -462,7 +469,7 @@ bool rule_return_cond(token_storage_t* token_storage) {
         return 1;
     }
             
-    if (rule_expr(token_storage, false) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;

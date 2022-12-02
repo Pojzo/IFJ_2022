@@ -31,7 +31,11 @@ const int prec_table[N][N] =
 
 
 
-bool rule_expr(token_storage_t *token_storage, bool if_while) {
+bool rule_expr(token_storage_t *token_storage) {
+    get_token(token_storage);
+    return 1;
+    
+    /*
     (void) if_while;
     int left_brackets = 0;
     list_t *list = list_init();
@@ -121,7 +125,9 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
     (void) input;
     (void) row;
     (void) column;
+    */
 } 
+
 
 int convert_symbol_to_int(symbol_enum symbol) {
     switch(symbol) {

@@ -28,7 +28,7 @@ bool term_semicolon(token_storage_t *token_storage);
 bool term_colon(token_storage_t *token_storage);
 bool term_comma(token_storage_t *token_storage);
 bool term_id(token_storage_t *token_storage);
-bool term_idfun(token_storage_t *token_storage);
+bool term_idfun(token_storage_t *token_storage, bool is_fdef);
 bool term_type(token_storage_t *token_storage);
 bool rule_fdef (token_storage_t *token_storage);
 bool rule_function_arguments(token_storage_t *token_storage);
