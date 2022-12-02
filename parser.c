@@ -22,7 +22,6 @@ char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak,
 
 
 int parser_start(char *buffer) {
-    printf("som tu \n");
     token_index = 0;
     // we first check if <? is present
 
