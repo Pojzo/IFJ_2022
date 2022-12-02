@@ -41,6 +41,17 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
     symbol_enum top;
     int row, column;
     bool valid;
+
+
+
+    symbol_enum symbol1 = INT;
+    symbol_enum symbol2 = INT;
+
+    symbol_enum symbol3 = INT;
+
+    int numsym;
+
+
     assoc_t prec_operator; 
     bool input_loaded = false;
     while (input_loaded || (final_condition(list))) { //TODO 
@@ -72,17 +83,16 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
         prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {
-            symbol_enum symbol1;
-            symbol_enum symbol2;
-            symbol_enum symbol3;
-            int numsym;
             if(!return_before_stop(&list, symbol1, symbol2, symbol3, numsym)){
                 return 0;
             }
-            if(!rule_check(symbol1, symbol2, symbol3, numsym)){
-                return 0;
+            if(rule_check(&symbol1, &symbol2, &symbol3, &numsym))
+            {
+                list_insert_first(&list, NONTERM);
             }
-
+            (void)symbol1;
+            (void)symbol2;
+            (void)symbol3;
         }
         else if (prec_operator == R_A) {
             list_insert_after_nonterm(&list);
@@ -210,20 +220,21 @@ symbol_enum convert_token_to_symbol(token_t *token, bool valid) {
     return NEQ;
 }
 
-int rule_check(symbol_enum symbol1, symbol_enum symbol2, symbol_enum symbol3, int numsym) {
-    if (numsym == 1) {
-        if (symbol1 == INT || symbol1 == FLOAT || symbol1 == STRING) {
+int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int* numsym) {
+    if (*numsym == 1) {
+        if (*symbol1 == INT || *symbol1 == FLOAT || *symbol1 == STRING) {
             return 1;
         }
     }
-    if (numsym == 3)
+    if (*numsym == 3)
     {
-        if (symbol1 == NONTERM && symbol2 < DOLLAR && symbol3 == NONTERM) {
+        if (*symbol1 == NONTERM && *symbol2 < DOLLAR && *symbol3 == NONTERM) {
+            
             return 1; 
             //  TODO dd pouzijeme pravidlo E op E je E neviem ako to pouzijeme thb
             //  toto asi este rozpiseme pre jeednotlive operacia aby sme spravili ten storm 
         }
-        if (symbol1 == OPENBR && symbol2 == NONTERM && symbol3 == CLOSEDBR) {
+        if (*symbol1 == OPENBR && *symbol2 == NONTERM && *symbol3 == CLOSEDBR) {
             return 1; 
             //  TODO dd pouzijeme pravidlo (E) je E neviem ako to pouzijeme thb
         }
