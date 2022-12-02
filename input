@@ -6,7 +6,7 @@ function zopid(int $gazdik, string $davidko) : int {
         return 5;
         return $gazdik === $cmorik;
         return $gazdik < $cmorik;
-        return $gazdik >= $cmorik;
+        //return $gazdik >= $cmorik;
         return $gazdik <= $cmorik;
     }
 }

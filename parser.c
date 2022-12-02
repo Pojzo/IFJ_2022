@@ -17,6 +17,9 @@ extern const char *epilog;
 extern const char* string_operators[];
 extern const int string_oper_len;
 
+char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
+
+
 
 int parser_start(char *buffer) {
     token_index = 0;
@@ -227,6 +230,7 @@ bool term_else(token_storage_t *token_storage) {
     }
     return 0;
 }
+
 
 bool term_function(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);

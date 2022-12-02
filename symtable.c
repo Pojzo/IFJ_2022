@@ -15,7 +15,7 @@ int insert_function_id(id_node_t** node, char* name, data_type return_type, data
     if ((*node) == NULL){
         *node = malloc(sizeof(id_node_t));
         if((*node == NULL)){
-            return;
+            return 0;
         }
         (*node)->name = name;
         (*node)->left = NULL;
@@ -45,7 +45,7 @@ int insert_id(id_node_t** node, char* name, data_type datatype, char* scope){
     if ((*node) == NULL){
         *node = malloc(sizeof(id_node_t));
         if((*node == NULL)){
-            return;
+            return 0;
         }
         (*node)->name = name;
         (*node)->left = NULL;
