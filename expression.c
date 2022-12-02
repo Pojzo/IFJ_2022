@@ -8,10 +8,10 @@
 
 typedef enum {
     L_A, // left association >
-    R_A, // right association 
-    EQ_A, // equal association
-    ERR,
-    END
+    R_A, // right association <
+    EQ_A, // equal association = 
+    ERR,  // error
+    END   // end of input
 } assoc_t;
 
 #define N 8
@@ -39,6 +39,7 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
     symbol_enum input;
     symbol_enum top;
     int row, column;
+    prec_table prec_operator; 
     bool input_loaded = false;
     while (true) { //TODO 
         if (!input_loaded) {
@@ -62,6 +63,24 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
             input = DOLLAR;
             top = list_get_first_term(list);
             row = convert_symbol(top);
+        }
+        // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
+        prec_operator = prec_table[row][column];
+        // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
+        if (prec_operator == L_A) {
+            // TODO >
+        }
+        else if (prec_operator == R_A) {
+            // TODO < 
+        }
+        else if (prec_operator == EQ_A) {
+            // TODO =
+        }
+        else if (prec_operator == ERR) {
+            // TODO err
+        }
+        else {
+            // TODO END
         }
     }
     (void) input;
