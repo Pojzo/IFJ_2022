@@ -5,7 +5,6 @@
 #include "expression.h"
 #include "tokenizer.h"
 #include "list.h"
-#include "list.c"
 
 typedef enum {
     L_A, // left association >
@@ -39,14 +38,12 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
     list_insert_first(&list, DOLLAR);
     symbol_enum input;
     symbol_enum top;
-    int row, column;
+    int row; 
+    int column;
     bool valid;
-
-
 
     symbol_enum symbol1 = INT;
     symbol_enum symbol2 = INT;
-
     symbol_enum symbol3 = INT;
 
     int numsym;
@@ -68,8 +65,8 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
                 }
             }
             //MAKE SYMBOL OUT OF TOKEN 
-            top = list_get_first_term(list);
-            input = convert_token_to_symbol(token,valid);
+            top = list_get_first_term(&list);
+            input = convert_token_to_symbol(token,&valid);
             if (valid == 0)
             {
                 return 0;
@@ -77,13 +74,13 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
         }
         else {
             input = DOLLAR;
-            top = list_get_first_term(list);
+            top = list_get_first_term(&list);
         }
         // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
         prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {
-            if(!return_before_stop(&list, symbol1, symbol2, symbol3, numsym)){
+            if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){
                 return 0;
             }
             if(rule_check(&symbol1, &symbol2, &symbol3, &numsym))
@@ -96,7 +93,7 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
         }
         else if (prec_operator == R_A) {
             list_insert_after_nonterm(&list);
-            list_insert_first(&list, column);// neviem ci tu ma byt column
+            list_insert_first(&list, input);// neviem ci tu ma byt column
             if(!input_loaded) {
                 get_token(token_storage);
             }
@@ -104,7 +101,7 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
            
         }
         else if (prec_operator == EQ_A) {
-            list_insert_first(&list, column);
+            list_insert_first(&list, input);
             if(!input_loaded) {
                 get_token(token_storage);
             }
@@ -161,11 +158,10 @@ int convert_symbol_to_int(symbol_enum symbol) {
     return -1;
 }
 
-symbol_enum convert_token_to_symbol(token_t *token, bool valid) {
-
-    valid = 1;
+symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
+    *valid = 1;
     if (token == NULL) {
-        valid = 0;
+        *valid = 0;
         return INT;
     }
 
@@ -216,7 +212,7 @@ symbol_enum convert_token_to_symbol(token_t *token, bool valid) {
             return NEQ;
         }
     }
-    valid = 0;
+    *valid = 0;
     return NEQ;
 }
 
