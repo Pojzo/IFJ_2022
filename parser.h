@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 
+
 int parser_start(char *buffer);
 int check_strict_types(token_storage_t *token_storage);
 bool check_prolog(char *buffer);

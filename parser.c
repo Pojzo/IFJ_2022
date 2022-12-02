@@ -7,7 +7,7 @@
 #include "parser.h"
 #include "expression.h"
 #include "utils.h"
-
+#include "symtable.h"
 
 int token_index = 0;
 extern const char *prolog;
@@ -17,9 +17,15 @@ extern const char *epilog;
 extern const char* string_operators[];
 extern const int string_oper_len;
 
+//arguments for inserting into symtable
 char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
+char *return_type = "";
+char **arguments;
+data_type arg = ID_VOID;
 
-
+//definicia symbol table
+id_node_t **id_node;
+id_node_init(&id_node);
 
 int parser_start(char *buffer) {
     token_index = 0;
@@ -54,6 +60,7 @@ int parser_start(char *buffer) {
 
     // check if declare(strict_types=1) is present
     if (!rule_program(token_storage)) {
+    
         printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
         return 2;
     }
@@ -65,7 +72,7 @@ int parser_start(char *buffer) {
     // printf("Number of tokens: %d\n", token_storage->num_tokens);
 
     token_storage_free(token_storage);
-
+    print_tree(*id_node);
     return error;
 }
 
@@ -313,6 +320,7 @@ bool term_type(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
     if (token != NULL && token->token_type == TOK_KEYWORD) {
         if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0){
+            //char *return_type = token->value;
             get_token(token_storage);
             return 1;
         }    
@@ -358,8 +366,10 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
+        insert_id(&id_node, token->value, arg, scope);
         if( term_equals(token_storage) && rule_expr(token_storage) && 
         term_semicolon(token_storage)) {
+            if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
             return 1;
         }
         else {
@@ -416,8 +426,9 @@ bool rule_fdef (token_storage_t *token_storage) {
         if (term_idfun(token_storage, true) && term_open_bracket(token_storage) && rule_function_arguments(token_storage) && 
             term_colon(token_storage) && term_type(token_storage) && term_open_curly_bracket(token_storage) &&
             rule_function_body(token_storage)) {
+            //insert_function_id(id_node, scope, return_type, arguments);
             scope = "global";
-             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
+            if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
             return 1;
         }
     }

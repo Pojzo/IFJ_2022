@@ -1,12 +1,23 @@
 <?php
 declare(strict_types=1);
 function zopid(int $gazdik, string $davidko) : int {
-    if ($x === $y) {
-        return;
-        return 5;
-        return $gazdik === $cmorik;
-        return $gazdik < $cmorik;
-        //return $gazdik >= $cmorik;
-        return $gazdik <= $cmorik;
-    }
+    $ahoj = x;
+    
 }
+$id3 = 5;
+function dabid(int $gazdik, string $davidko) : int {
+    $ahoj = x;
+    
+}
+$id2 = 5;
+function perzo(int $gazdik, string $davidko) : int {
+    $ahoj = x;
+    
+}
+$id1 = 5;
+function osratyMarek(int $gazdik, string $davidko) : int {
+    $ahoj = x;
+    
+}
+
+$id = 5;

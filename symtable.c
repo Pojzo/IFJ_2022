@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
+
 #include "symtable.h"
 //TODO errory su nekonzistentne, to este musime dohodnut ako ich dame 
 
 void id_node_init(id_node_t **node){
-    *node = NULL;
+    *(node) = NULL;
 }
 
 //inserting function
@@ -159,6 +159,16 @@ void free_tree(id_node_t* node){
     free_tree(node->left);
     free_tree(node->right);
     free(node);
+}
+
+//function that prints all nodes of tree
+void print_tree(id_node_t* node){
+    if(node == NULL){
+        return;
+    }
+    print_tree(node->left);
+    printf("name: %s , scope: %s\n",node->name, node->scope);
+    print_tree(node->right);
 }
 
 

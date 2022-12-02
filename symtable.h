@@ -3,7 +3,7 @@
 #include <stdbool.h>
 // symbol table using a binary tree structure
 
-typedef enum {INT, FLOAT, STRING, VOID} data_type;
+typedef enum {ID_INT, ID_FLOAT, ID_STRING, ID_VOID} data_type;
 
 //tree node 
 typedef struct id_node {
@@ -20,10 +20,12 @@ typedef struct id_node {
     
 } id_node_t;
 
+void id_node_init(id_node_t **node);
 int insert_function_id(id_node_t** node, char* name, data_type return_type, data_type **arguments );
 int insert_id(id_node_t** node, char* name, data_type datatype, char* scope);
 bool is_bigger(char* a, char* b);
 int check_if_declared(id_node_t* node, char* name, char* scope);
 int check_if_function_declared(id_node_t* node, char* name, data_type **arguments);
 void free_tree(id_node_t* node);
+void print_tree(id_node_t* node);
 #endif
