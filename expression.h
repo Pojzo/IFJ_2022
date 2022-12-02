@@ -27,7 +27,8 @@ typedef enum {
 
 
 bool rule_expr(token_storage_t *token_storage, bool if_while);
-int convert_operator(token_t *token);
-int convert_symbol(symbol_enum symbol);
+symbol_enum convert_token_to_symbol(token_t *token, bool valid);
+int convert_symbol_to_int(symbol_enum symbol);
+int rule_check(symbol_enum symbol1, symbol_enum symbol2, symbol_enum symbol3, int num);
 
 #endif

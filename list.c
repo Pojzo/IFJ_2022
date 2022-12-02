@@ -85,3 +85,35 @@ bool final_condition(list_t *list) {
     assert_not_null(list);
     return (list->symbol == NONTERM && list->next->symbol == DOLLAR && list->next->next == NULL);
 }
+
+int return_before_stop(list_t** list, symbol_enum symbol1, symbol_enum symbol2, symbol_enum symbol3, int num) {
+    list_t* curr = *list;
+    for(num = 0; curr->symbol != STOP; num++)
+    {
+        if(num == 0) {
+            symbol1 = curr->symbol;
+            list_pop_first(list);
+        }
+        else if(num == 1) {
+            symbol2 = curr->symbol;
+            list_pop_first(list);
+        }
+        else if(num == 2) {
+            symbol3 = curr->symbol;
+            list_pop_first(list);
+        }
+        else {
+            return 0;
+        }
+        curr = curr->next;
+    }
+    list_pop_first(list);
+    if (num != 1 || num != 3)
+    {
+        return 0; 
+    }
+    return 1;
+}
+
+
+

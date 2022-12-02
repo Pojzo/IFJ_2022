@@ -5,6 +5,7 @@
 #include "expression.h"
 #include "tokenizer.h"
 #include "list.h"
+#include "list.c"
 
 typedef enum {
     L_A, // left association >
@@ -39,9 +40,10 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
     symbol_enum input;
     symbol_enum top;
     int row, column;
-    prec_table prec_operator; 
+    bool valid;
+    assoc_t prec_operator; 
     bool input_loaded = false;
-    while (true) { //TODO 
+    while (input_loaded || (final_condition(list))) { //TODO 
         if (!input_loaded) {
             token_t *token = get_token_keep(token_storage);
             if (strcmp(token->value, "(") == 0) {
@@ -56,39 +58,65 @@ bool rule_expr(token_storage_t *token_storage, bool if_while) {
             }
             //MAKE SYMBOL OUT OF TOKEN 
             top = list_get_first_term(list);
-            row = convert_symbol(top);
-            column = convert_operator(token);
+            input = convert_token_to_symbol(token,valid);
+            if (valid == 0)
+            {
+                return 0;
+            }
         }
         else {
             input = DOLLAR;
             top = list_get_first_term(list);
-            row = convert_symbol(top);
         }
         // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
-        prec_operator = prec_table[row][column];
+        prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {
-            // TODO >
+            symbol_enum symbol1;
+            symbol_enum symbol2;
+            symbol_enum symbol3;
+            int numsym;
+            if(!return_before_stop(&list, symbol1, symbol2, symbol3, numsym)){
+                return 0;
+            }
+            if(!rule_check(symbol1, symbol2, symbol3, numsym)){
+                return 0;
+            }
+
         }
         else if (prec_operator == R_A) {
-            // TODO < 
+            list_insert_after_nonterm(&list);
+            list_insert_first(&list, column);// neviem ci tu ma byt column
+            if(!input_loaded) {
+                get_token(token_storage);
+            }
+
+           
         }
         else if (prec_operator == EQ_A) {
-            // TODO =
+            list_insert_first(&list, column);
+            if(!input_loaded) {
+                get_token(token_storage);
+            }
+
+
         }
         else if (prec_operator == ERR) {
+            return 0;
             // TODO err
         }
         else {
-            // TODO END
+            return 0;
+            // TODO CHYBA
         }
     }
+    return 1;
     (void) input;
     (void) row;
     (void) column;
 } 
 
-int convert_symbol(symbol_enum symbol) {
+int convert_symbol_to_int(symbol_enum symbol) {
     switch(symbol) {
         case MUL:
         case DIV:
@@ -123,50 +151,83 @@ int convert_symbol(symbol_enum symbol) {
     return -1;
 }
 
-// -1 je error (je ne?)
-int convert_operator(token_t *token) {
+symbol_enum convert_token_to_symbol(token_t *token, bool valid) {
 
+    valid = 1;
     if (token == NULL) {
-        return 7;
+        valid = 0;
+        return INT;
     }
 
     if (((token->token_type == TOK_ID) && (token->value[0] == '$')) || token->token_type == TOK_LIT) {
-        return 6;
+        return INT; // sem string alebo int alebo float
     }
 
     if(token->token_type == TOK_ID) {
         // toto je funkcia
         // takze s tym nieco este budeme musiet spravit
-        return 10;
+        return INT;
     }
 
     int length = strlen(token->value);
     if (length == 1) {
         switch (token->value[0]) {
         case '*':
+            return MUL;
         case '/':
-            return 0;
+            return DIV;
         case '+':
+            return ADD;
         case '-':
+            return SUB;
         case '.':
-            return 1;
+            return CONC;
         case '<':
+            return LT;
         case '>':
-            return 2;
-        
+            return GT;
         case '(':
-            return 4;
+            return OPENBR;
         case ')':
-            return 5;
+            return CLOSEDBR;
         }
     }
     else {
-        if (strcmp(token->value, "<=") == 0 || strcmp(token->value, ">=") == 0) {
-            return 2;
+        if (strcmp(token->value, "<=") == 0) {
+            return LTE;
         }
-        if (strcmp(token->value, "===") == 0 || strcmp(token->value, "!==") == 0) {
-            return 3;
+        if (strcmp(token->value, ">=") == 0) {
+            return GTE;
+        }
+        if (strcmp(token->value, "===") == 0) {
+            return EQ;
+        }
+        if (strcmp(token->value, "!==") == 0) {
+            return NEQ;
         }
     }
-    return -1;
+    valid = 0;
+    return NEQ;
 }
+
+int rule_check(symbol_enum symbol1, symbol_enum symbol2, symbol_enum symbol3, int numsym) {
+    if (numsym == 1) {
+        if (symbol1 == INT || symbol1 == FLOAT || symbol1 == STRING) {
+            return 1;
+        }
+    }
+    if (numsym == 3)
+    {
+        if (symbol1 == NONTERM && symbol2 < DOLLAR && symbol3 == NONTERM) {
+            return 1; 
+            //  TODO dd pouzijeme pravidlo E op E je E neviem ako to pouzijeme thb
+            //  toto asi este rozpiseme pre jeednotlive operacia aby sme spravili ten storm 
+        }
+        if (symbol1 == OPENBR && symbol2 == NONTERM && symbol3 == CLOSEDBR) {
+            return 1; 
+            //  TODO dd pouzijeme pravidlo (E) je E neviem ako to pouzijeme thb
+        }
+    }
+    return 0;
+}
+
