@@ -1,23 +1,5 @@
 <?php
 declare(strict_types=1);
-function zopid(int $gazdik, string $davidko) : int {
-    $ahoj = x;
-    
+function marecek(int $arg1): int {
+    return $arg1
 }
-$id3 = 5;
-function dabid(int $gazdik, string $davidko) : int {
-    $ahoj = x;
-    
-}
-$id2 = 5;
-function perzo(int $gazdik, string $davidko) : int {
-    $ahoj = x;
-    
-}
-$id1 = 5;
-function osratyMarek(int $gazdik, string $davidko) : int {
-    $ahoj = x;
-    
-}
-
-$id = 5;

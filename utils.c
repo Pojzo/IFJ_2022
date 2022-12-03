@@ -47,3 +47,13 @@ void debug_print_state(const char *state_name, const char *string_ptr, int strin
     printf("%c", *(string_ptr + string_length - 1));
     printf(" %d\n", string_length);
 }
+
+//fucntion appends string into given array
+void arg_append(char **args, char *arg) {
+    int i = 0;
+    while (args[i] != '\0') {
+        i++;
+    }
+    args[i] = arg; 
+    
+}

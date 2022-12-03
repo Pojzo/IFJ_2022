@@ -1,33 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "tokenizer.h"
+#include "utils.h"
 #include "symtable.h"
 //TODO errory su nekonzistentne, to este musime dohodnut ako ich dame 
-
+/*
 void id_node_init(id_node_t **node){
-    *(node) = NULL;
-}
+    node = NULL;
+}*/
 
 //inserting function
-int insert_function_id(id_node_t** node, char* name, data_type return_type, data_type **arguments ){
+int insert_function_id(id_node_t* node, char* name, char *return_type, char **arguments ){
     //if inserting root
-    if ((*node) == NULL){
-        *node = malloc(sizeof(id_node_t));
-        if((*node == NULL)){
+    if (node == NULL){
+        node = malloc(sizeof(struct id_node));
+        if(node == NULL){
             return 0;
         }
-        (*node)->name = name;
-        (*node)->left = NULL;
-        (*node)->right = NULL;
-        (*node)->return_type = return_type;
-        (*node)->arguments = arguments;
+        node->name = name;
+        node->left = NULL;
+        node->right = NULL;
+        node->return_type = return_type;
+        node->arguments = arguments;
     }
-    if(is_bigger((*node)->name,name)){
-        insert_function_id(&((*node)->left),name,return_type,arguments);
+    if(is_bigger(node->name,name)){
+        insert_function_id(node->left, name, return_type, arguments);
     }
-    else if(is_bigger(name,(*node)->name)){
-        insert_function_id(&((*node)->right),name,return_type,arguments);
+    else if(is_bigger(name, node->name)){
+        insert_function_id(node->right, name, return_type, arguments);
     }
     else{
         //pokus o redefinicu funkcie - ERROR code 3
@@ -39,12 +40,12 @@ int insert_function_id(id_node_t** node, char* name, data_type return_type, data
 
 //inserting ID
 //funckia sa bude volat iba v priradeni v parseri
-int insert_id(id_node_t** node, char* name, data_type datatype, char* scope){
+int insert_id(id_node_t **node, char* name, char* datatype, char* scope){
     //if inserting root
     int error = 0;
-    if ((*node) == NULL){
-        *node = malloc(sizeof(id_node_t));
-        if((*node == NULL)){
+   if (*(node) == NULL){
+        *node = malloc(sizeof(struct id_node));
+        if(*node == NULL){
             return 0;
         }
         (*node)->name = name;
@@ -52,28 +53,33 @@ int insert_id(id_node_t** node, char* name, data_type datatype, char* scope){
         (*node)->right = NULL;
         (*node)->datatype = datatype;
         (*node)->scope = scope;
+        //print_tree(*node);
+        //pozor pozor, psekulacia 
+        return error;
     }
     //ked je vacsie idem do lava
-    if(is_bigger((*node)->name,name)){
-        insert_id(&((*node)->left), name, datatype, scope);
+    if(is_bigger((*node)->name, name)){
+        insert_id(&(*node)->left, name, datatype, scope);
     }
     //ked je mensie idem do prava
-    else if(is_bigger(name,(*node)->name)){
-        insert_id(&((*node)->right), name, datatype, scope);
+    else if(is_bigger(name, (*node)->name)){
+        insert_id(&(*node)->right, name, datatype, scope);
     }
     //ak sa rovnaju mena a aj scope
     else if(strcmp((*node)->scope,scope) == 0){
         //pokus o redefiniciu premennej v ramci scope s inym datovym typom
         if ((*node)->datatype != datatype){
-            error = 1;
+            (*node)->datatype = datatype;
         }
     }
     //ak sa rovnaju mena id ale scope nie 
     else{
-        insert_id(&((*node)->right), name, datatype, scope);
+        printf("PREPADLI SME SEM BRASKO POMOC\n");
+        insert_id(&(*node)->right, name, datatype, scope);
     }
     return error;    
 }
+
 
 //comparing strings alphabetically
 bool is_bigger(char* a, char* b){
@@ -117,7 +123,7 @@ int check_if_declared(id_node_t* node, char* name, char* scope){
     }
 }
 
-int check_if_function_declared(id_node_t* node, char* name, data_type **arguments){
+int check_if_function_declared(id_node_t* node, char* name, char **arguments){
     if(node == NULL){
         return 0;
     }
@@ -167,11 +173,30 @@ void print_tree(id_node_t* node){
         return;
     }
     print_tree(node->left);
-    printf("name: %s , scope: %s\n",node->name, node->scope);
+    printf("--------------------------------------\n");
+    printf("NODE:\n"); 
+    printf("name: %s\nscope: %s\ndatatype: %s\n",node->name, node->scope, node->datatype);
     print_tree(node->right);
 }
 
 
+char* get_data_type(token_t *token){
+    if (token->token_type == TOK_LIT){
+        if (strcmp(token->value, "NULL") == 0){
+            return "VOID";
+        }  
+        else if(is_digit(token->value[0]) && arr_contains_char(token->value, '.', strlen(token->value))){
+            return "FLOAT";
+        }
+        else if(is_digit(token->value[0])){
+            return "INT";
+            }
+        else if(token->value[0] == '"'){
+            return "STRING";
+        }
+    }
+    return NULL;
+}
 /*
 node_t *node_create(char *key, char *value) {
     node_t *node = (node_t *) malloc(sizeof(node_t));

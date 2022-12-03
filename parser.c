@@ -20,12 +20,12 @@ extern const int string_oper_len;
 //arguments for inserting into symtable
 char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
 char *return_type = "";
-char **arguments;
-data_type arg = ID_VOID;
+char *arg = "VOID";                                                                                                                    char arguments[100][100];
+
+id_node_t *id_node = NULL;
 
 //definicia symbol table
-id_node_t **id_node;
-id_node_init(id_node);
+
 
 int parser_start(char *buffer) {
     token_index = 0;
@@ -70,10 +70,11 @@ int parser_start(char *buffer) {
     }
 
     // printf("Number of tokens: %d\n", token_storage->num_tokens);
-
+    print_tree(id_node);
     token_storage_free(token_storage);
-    print_tree(*id_node);
+    free_tree(id_node);
     return error;
+
 }
 
 
@@ -367,6 +368,7 @@ bool rule_st(token_storage_t *token_storage) {
 
     if (term_id(token_storage)) {
         insert_id(&id_node, token->value, arg, scope);
+        //print_tree(id_node);
         if( term_equals(token_storage) && rule_expr(token_storage) && 
         term_semicolon(token_storage)) {
             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
@@ -448,6 +450,7 @@ bool rule_function_arguments(token_storage_t *token_storage) {
 
 bool rule_argf(token_storage_t *token_storage) {
     if (term_type(token_storage) && term_id(token_storage)) {
+        //arg_append()
         return 1;
     }
     return 0;
@@ -472,7 +475,6 @@ bool rule_function_body(token_storage_t* token_storage) {
     }
     return 0;
 }
-
 
 bool rule_return_cond(token_storage_t* token_storage) {
     if (term_semicolon(token_storage)) {
