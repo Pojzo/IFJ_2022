@@ -34,16 +34,11 @@ const int prec_table[N][N] =
 bool rule_expr(token_storage_t *token_storage) {
     get_token(token_storage);
     return 1;
-    
-    /*
-    (void) if_while;
     int left_brackets = 0;
     list_t *list = list_init();
     list_insert_first(&list, DOLLAR);
     symbol_enum input;
     symbol_enum top;
-    int row; 
-    int column;
     bool valid;
 
     symbol_enum symbol1 = INT;
@@ -91,13 +86,14 @@ bool rule_expr(token_storage_t *token_storage) {
             {
                 list_insert_first(&list, NONTERM);
             }
-            (void)symbol1;
-            (void)symbol2;
-            (void)symbol3;
+            else {
+                return 0;
+            }
         }
+
         else if (prec_operator == R_A) {
             list_insert_after_nonterm(&list);
-            list_insert_first(&list, input);// neviem ci tu ma byt column
+            list_insert_first(&list, input);
             if(!input_loaded) {
                 get_token(token_storage);
             }
@@ -122,10 +118,6 @@ bool rule_expr(token_storage_t *token_storage) {
         }
     }
     return 1;
-    (void) input;
-    (void) row;
-    (void) column;
-    */
 } 
 
 

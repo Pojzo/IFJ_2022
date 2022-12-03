@@ -25,7 +25,7 @@ data_type arg = ID_VOID;
 
 //definicia symbol table
 id_node_t **id_node;
-id_node_init(&id_node);
+id_node_init(id_node);
 
 int parser_start(char *buffer) {
     token_index = 0;
