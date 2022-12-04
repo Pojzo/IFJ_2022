@@ -20,7 +20,7 @@ extern const int string_oper_len;
 //arguments for inserting into symtable
 char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
 char *return_type = "";
-char *arg = "VOID";                                                                                                                    char arguments[100][100];
+char **args = NULL;
 
 id_node_t *id_node = NULL;
 
@@ -320,7 +320,7 @@ bool term_idfun(token_storage_t *token_storage, bool is_fdef) {
 bool term_type(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
     if (token != NULL && token->token_type == TOK_KEYWORD) {
-        if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0){
+        if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0 || strcmp(token->value, "void") == 0) {
             //char *return_type = token->value;
             get_token(token_storage);
             return 1;
@@ -358,6 +358,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_idfun(token_storage, 0)) {
+        
         if(term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
             return 1;
         }
@@ -367,7 +368,9 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
-        insert_id(&id_node, token->value, arg, scope);
+        
+        insert_id(&id_node, token->value, TYPE_VOID, scope);
+
         //print_tree(id_node);
         if( term_equals(token_storage) && rule_expr(token_storage) && 
         term_semicolon(token_storage)) {
@@ -393,6 +396,7 @@ bool rule_fstlist(token_storage_t *token_storage) {
     if (rule_st(token_storage) && rule_fstlist(token_storage)) {
         return 1;
     }
+
     return 0;
 }
 
@@ -425,20 +429,32 @@ bool rule_next (token_storage_t *token_storage) {
 
 bool rule_fdef (token_storage_t *token_storage) {
     if (term_function(token_storage)) {
+        token_t *fun_name = get_token_keep(token_storage);
+        // toto znamena ze tato funkcia uz bola definovana
+        if (insert_function_id(&id_node, fun_name->value) == 3) {
+            printf("vratilo to trojku\n");
+            return 0;
+        }
+
         if (term_idfun(token_storage, true) && term_open_bracket(token_storage) && rule_function_arguments(token_storage) && 
-            term_colon(token_storage) && term_type(token_storage) && term_open_curly_bracket(token_storage) &&
-            rule_function_body(token_storage)) {
+            term_colon(token_storage)) {
+            
+            token_t *token = get_token_keep(token_storage);
+            fun_add_return_type(id_node, fun_name->value, convert_char_to_datatype(token->value));
+            if(term_type(token_storage) && term_open_curly_bracket(token_storage) &&
+                rule_function_body(token_storage)) {
             //insert_function_id(id_node, scope, return_type, arguments);
-            scope = "global";
-            if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
-            return 1;
+                scope = "global";
+                if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
+                    return 1;
+            }
         }
     }
     return 0;
 }
 
 bool rule_function_arguments(token_storage_t *token_storage) {
-    if (term_open_bracket(token_storage)) {
+    if (term_close_bracket(token_storage)) { //tu sme
         return 1;
     }
     if(rule_argf(token_storage) && rule_more_argf(token_storage)) {
@@ -447,14 +463,22 @@ bool rule_function_arguments(token_storage_t *token_storage) {
     return 0;
 }
 
-
+//rule argf
 bool rule_argf(token_storage_t *token_storage) {
-    if (term_type(token_storage) && term_id(token_storage)) {
-        //arg_append()
-        return 1;
+    token_t *datatype = get_token_keep(token_storage);
+    if (term_type(token_storage)){
+        token_t *name = get_token_keep(token_storage);
+        if(term_id(token_storage)) {
+            printf("insertujem\n");
+            insert_id(&id_node, name->value, convert_char_to_datatype(datatype->value), scope);
+            fun_add_arg(id_node, scope, convert_char_to_datatype(datatype->value));
+            return 1;
+        }
     }
     return 0;
 }
+
+
 
 bool rule_more_argf(token_storage_t *token_storage) {
     if (term_close_bracket(token_storage)) {

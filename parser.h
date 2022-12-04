@@ -3,6 +3,7 @@
 
 #include "tokenizer.h"
 #include <stdbool.h>
+#include "symtable.h"
 
 
 
@@ -41,6 +42,8 @@ bool rule_cond_end(token_storage_t* token_storage);
 bool term_cond_op(token_storage_t *token_storage);
 bool rule_return_cond(token_storage_t* token_storage);
 bool rule_return_cond_end(token_storage_t* token_storage);
+
+
 
 
 

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
-function marecek(int $arg1): int {
-    return $arg1
+function marecek(int $gazdo, string $matusgazdik, int $davidkojokaj, int $peterkovac): void {
+    $x = 5;
+    return $arg1;
 }

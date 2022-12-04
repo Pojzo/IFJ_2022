@@ -49,11 +49,13 @@ void debug_print_state(const char *state_name, const char *string_ptr, int strin
 }
 
 //fucntion appends string into given array
-void arg_append(char **args, char *arg) {
+/*void arg_append(char **args, char *arg) {
     int i = 0;
     while (args[i] != '\0') {
         i++;
     }
+    realloc(args, (i + 1) * sizeof(char *));
     args[i] = arg; 
     
-}
+}*/
+
