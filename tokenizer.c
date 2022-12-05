@@ -544,7 +544,6 @@ state state_start(char c){
             i++;
             return STATE_GREATER_EQUAL;
         }
-        i++;
         return STATE_OP;
     }
     else if (c == '!') {
