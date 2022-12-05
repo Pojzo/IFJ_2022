@@ -10,7 +10,7 @@
 const int MAX_BUFFER_LEN = 1000;
 
 const int DEBUG_PARSER = 0;
-const int DEBUG_LEXER = 1;
+const int DEBUG_LEXER = 0;
 
 
 char *get_buffer();
@@ -66,8 +66,8 @@ const char *epilog = "?>";
 
 int main() {
 
-    char *source = get_buffer();
-    //char *source = get_stdin();
+    //char *source = get_buffer();
+    char *source = get_stdin();
     printf("%s", source);
     int error = run(source);
     free(source);
@@ -75,7 +75,7 @@ int main() {
        printf("Running prolog tests\n-------------------\n");
        test_prolog();
        */
-    printf("%d\n", error);
+    printf("antoaneta sa v hrobe obraca jak sa sem nedostanem\n");
     return error;
 }
 

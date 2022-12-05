@@ -17,7 +17,16 @@ typedef enum {
 typedef struct {
     token_t *token;
     symbol_enum symbol;
+    bool is_expr; 
+    //expr_t *expr;
 } token_symbol_t;
+
+typedef struct {
+    //expr_t *left;
+    //expr_t *right;
+    token_symbol_t* token_symbol;
+} expr_t;
+
 
 #define N 8
 
@@ -37,6 +46,12 @@ const int prec_table[N][N] =
 
 
 bool rule_expr(token_storage_t *token_storage) {
+    static int num_calls = 0;
+    for (int i = 0; i< 50; i++) {
+        // print num_calls and increment it
+        //printf("%d %s\n", num_calls, get_token_keep(token_storage)->value);
+    }
+    num_calls++;
     //get_token(token_storage);
     //return 1;
     int left_brackets = 0;
@@ -82,7 +97,7 @@ bool rule_expr(token_storage_t *token_storage) {
         }
         // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
         prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
-        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input));
+        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d, realny token je %s %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input), get_token_keep(token_storage)->value, input_loaded == true);
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {        
             if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){

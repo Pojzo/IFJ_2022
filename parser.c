@@ -31,14 +31,16 @@ int parser_start(char *buffer) {
     token_index = 0;
     // we first check if <? is present
 
+    int error = 0;
     if (!check_prolog(buffer)) {
         printf("\x1b[31m" "Error in checking prolog" "\x1b[0m" "\n");
-        return 2;
+        error = 2;
+        goto end;
     }
     buffer += strlen(prolog);
 
     token_storage_t *token_storage = token_storage_create();
-    int error = dka(buffer, strlen(buffer), token_storage);
+    error = dka(buffer, strlen(buffer), token_storage);
 
     // check if there was an error in lexical analysis
     
@@ -51,7 +53,8 @@ int parser_start(char *buffer) {
     token_index = 0;
     if (error) {
         printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
-        return error;
+        error = 1;
+        goto end;
     }
 
     else {
@@ -62,7 +65,8 @@ int parser_start(char *buffer) {
     if (!rule_program(token_storage)) {
     
         printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
-        return 2;
+        error = 2;
+        goto end;
     }
 
     else {
@@ -70,11 +74,12 @@ int parser_start(char *buffer) {
     }
 
     // printf("Number of tokens: %d\n", token_storage->num_tokens);
+    end:
+    printf("Tu som sa na sto kokotov musel dostat\n");
     print_tree(id_node);
     token_storage_free(token_storage);
     free_tree(id_node);
     return error;
-
 }
 
 
