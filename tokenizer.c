@@ -40,8 +40,10 @@ bool is_keyword(char *start_ptr, int token_value_len){
     }
     curr_str[token_value_len] = '\0'; 
     if (arr_contains_str(keywords, curr_str, keywords_len)){
+        free(curr_str);
         return true;
     }
+    free(curr_str);
     return false;
 }
 

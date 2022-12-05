@@ -172,8 +172,17 @@ bool is_equal(char* a, char* b){
 
 void free_tree(id_node_t* node){
     if(node == NULL){
+        // free node->arguments, which is array of enum datatype
+        for (int i = 0; i < node->num_arguments; i++) {
+            free(node->arguments[i]);
+        }
+        free(node->arguments);
+        // finish the lyrics: Fool me one time shame on you, fool me twice can't put the blame on you
+        // fool me three times, fuck the peace sign, I'ma put the blame on you
+
         return;
     }
+    
     free_tree(node->left);
     free_tree(node->right);
     free(node);
