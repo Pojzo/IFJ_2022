@@ -6,6 +6,28 @@
 
 #define assert_not_null(_list) assert(_list != NULL)
 
+const char *symbol_to_string[] = {
+    "INT",
+    "FLOAT",
+    "STRING",
+    "ADD",
+    "SUB",
+    "MUL",
+    "DIV",
+    "CONC",
+    "NEQ",
+    "EQ",
+    "GT",
+    "LT",
+    "GTE",
+    "LTE",
+    "DOLLAR",
+    "OPENBR",
+    "CLOSEDBR",
+    "STOP",
+    "NONTERM",
+};
+
 list_t* list_init() {
     return NULL;
 }
@@ -80,15 +102,28 @@ void list_pop_first(list_t **list) {
     free(todelete);
 }
 
+
 // checks whether the list only contains $E
 bool final_condition(list_t *list) {
     assert_not_null(list);
-    return (list->symbol == NONTERM && list->next->symbol == DOLLAR && list->next->next == NULL);
+    //printf("final_condition: %s, %s, %s\n", symbol_to_string[list->symbol], symbol_to_string[list->next->symbol], symbol_to_string[list->next->next->symbol]);
+    return (list->symbol == NONTERM && list->next->symbol == DOLLAR);
+}
+// print list
+void print_list(list_t *list) {
+    assert_not_null(list);
+    list_t *cur = list;
+    while (cur != NULL) {
+        printf("%s ", symbol_to_string[cur->symbol]);
+        cur = cur->next;
+    }
+    printf("\n");
 }
 
 int return_before_stop(list_t** list, symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int* num) {
     list_t* curr = *list;
-    for(*num = 0; curr->symbol != STOP; (*num)++)
+    *num = 0;
+    while(curr->symbol != STOP)
     {
         if(*num == 0) {
             *symbol1 = curr->symbol;
@@ -105,10 +140,11 @@ int return_before_stop(list_t** list, symbol_enum* symbol1, symbol_enum* symbol2
         else {
             return 0;
         }
+        (*num)++;
         curr = curr->next;
     }
     list_pop_first(list);
-    if (*num != 1 || *num != 3)
+    if (*num != 1 && *num != 3)
     {
         return 0; 
     }

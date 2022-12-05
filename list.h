@@ -9,6 +9,7 @@ typedef struct List {
 } list_t;
 
 list_t *list_init();
+void print_list(list_t *list);
 void list_free(list_t *list);
 void list_insert_first(list_t **list, symbol_enum symbol);
 void list_insert_after_nonterm(list_t **list);

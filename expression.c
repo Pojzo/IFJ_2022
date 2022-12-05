@@ -14,6 +14,11 @@ typedef enum {
     END   // end of input
 } assoc_t;
 
+typedef struct {
+    token_t *token;
+    symbol_enum symbol;
+} token_symbol_t;
+
 #define N 8
 
 const int prec_table[N][N] =
@@ -26,14 +31,14 @@ const int prec_table[N][N] =
 	{ R_A , R_A , R_A , R_A , R_A , EQ_A  , R_A ,  ERR  }, /// (
 	{ L_A , L_A , L_A , L_A ,  ERR  , L_A ,  ERR  , L_A }, /// )
 	{ L_A , L_A , L_A , L_A ,  ERR  , L_A ,  ERR  , L_A }, /// i (id, int, double, string)
-	{ R_A , R_A , R_A ,  ERR  , R_A ,  ERR  , EQ_A , END }  /// $
+	{ R_A , R_A , R_A ,  ERR  , R_A ,  ERR  , R_A , END }  /// $
 };
 
 
 
 bool rule_expr(token_storage_t *token_storage) {
-    get_token(token_storage);
-    return 1;
+    //get_token(token_storage);
+    //return 1;
     int left_brackets = 0;
     list_t *list = list_init();
     list_insert_first(&list, DOLLAR);
@@ -44,13 +49,13 @@ bool rule_expr(token_storage_t *token_storage) {
     symbol_enum symbol1 = INT;
     symbol_enum symbol2 = INT;
     symbol_enum symbol3 = INT;
-
     int numsym;
 
 
     assoc_t prec_operator; 
     bool input_loaded = false;
-    while (input_loaded || (final_condition(list))) { //TODO 
+
+    while (!input_loaded || !(final_condition(list))) { //TODO 
         if (!input_loaded) {
             token_t *token = get_token_keep(token_storage);
             if (strcmp(token->value, "(") == 0) {
@@ -66,9 +71,9 @@ bool rule_expr(token_storage_t *token_storage) {
             //MAKE SYMBOL OUT OF TOKEN 
             top = list_get_first_term(&list);
             input = convert_token_to_symbol(token,&valid);
-            if (valid == 0)
-            {
-                return 0;
+            if (valid == 0){
+                input_loaded = 1;
+                continue;
             }
         }
         else {
@@ -77,23 +82,29 @@ bool rule_expr(token_storage_t *token_storage) {
         }
         // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
         prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
+        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input));
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
-        if (prec_operator == L_A) {
+        if (prec_operator == L_A) {        
             if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){
                 return 0;
             }
-            if(rule_check(&symbol1, &symbol2, &symbol3, &numsym))
-            {
+            if(rule_check(&symbol1, &symbol2, &symbol3, numsym))
+            {        
                 list_insert_first(&list, NONTERM);
+                print_list(list);
+                if (input_loaded && final_condition(list)) {
+                    return 1;
+                }
             }
             else {
                 return 0;
             }
         }
-
-        else if (prec_operator == R_A) {
+        // <
+        else if (prec_operator == R_A) {   
             list_insert_after_nonterm(&list);
             list_insert_first(&list, input);
+            print_list(list);
             if(!input_loaded) {
                 get_token(token_storage);
             }
@@ -102,6 +113,7 @@ bool rule_expr(token_storage_t *token_storage) {
         }
         else if (prec_operator == EQ_A) {
             list_insert_first(&list, input);
+            print_list(list);
             if(!input_loaded) {
                 get_token(token_storage);
             }
@@ -112,9 +124,8 @@ bool rule_expr(token_storage_t *token_storage) {
             return 0;
             // TODO err
         }
-        else {
-            return 0;
-            // TODO CHYBA
+        else if (prec_operator == END) {
+            return 1;
         }
     }
     return 1;
@@ -214,25 +225,26 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
     return NEQ;
 }
 
-int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int* numsym) {
-    if (*numsym == 1) {
+int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int numsym) {
+    if (numsym == 1) {
         if (*symbol1 == INT || *symbol1 == FLOAT || *symbol1 == STRING) {
+            printf("Pouzivam pravidlo ked numsym je jedna\n");
             return 1;
         }
     }
-    if (*numsym == 3)
+    if (numsym == 3)
     {
         if (*symbol1 == NONTERM && *symbol2 < DOLLAR && *symbol3 == NONTERM) {
-            
+            printf("Pouzival pravidlo operator\n");
             return 1; 
             //  TODO dd pouzijeme pravidlo E op E je E neviem ako to pouzijeme thb
             //  toto asi este rozpiseme pre jeednotlive operacia aby sme spravili ten storm 
         }
         if (*symbol1 == OPENBR && *symbol2 == NONTERM && *symbol3 == CLOSEDBR) {
-            return 1; 
+            printf("Pouzival pravidlo operator\n");
+            return  1; 
             //  TODO dd pouzijeme pravidlo (E) je E neviem ako to pouzijeme thb
         }
     }
     return 0;
 }
-

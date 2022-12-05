@@ -137,7 +137,6 @@ id_node_t* search(id_node_t* node, char* name){
 
 int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype) {
     // print the datatype as string
-    printf("adding %s %d to %s\n", convert_back(datatype), (int) datatype, node->name);
     id_node_t* current = search(node, scope);
     current->num_arguments++;
     current->arguments = realloc(current->arguments, current->num_arguments * sizeof(enum datatype));
@@ -147,7 +146,6 @@ int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype) {
 
 int fun_add_return_type(id_node_t* node, char* scope, datatype_t datatype) {
     // print the datatype as string
-    printf("adding kokot %s %d to %s\n", convert_back(datatype), (int) datatype, node->name);
     id_node_t* current = search(node, scope);
     current->return_type = datatype;
     return 0;

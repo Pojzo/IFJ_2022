@@ -9,8 +9,8 @@
 
 const int MAX_BUFFER_LEN = 1000;
 
-const int DEBUG_PARSER = 1;
-const int DEBUG_LEXER = 0;
+const int DEBUG_PARSER = 0;
+const int DEBUG_LEXER = 1;
 
 
 char *get_buffer();
@@ -20,7 +20,7 @@ void test_prolog();
 // comment the code below
 char *get_buffer() {
     FILE *fp;
-    fp = fopen("input", "r");
+    fp = fopen("input.txt", "r");
     if (ferror(fp)) {
         printf("Couldn't open input file\n");
         fclose(fp);

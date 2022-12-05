@@ -469,7 +469,6 @@ bool rule_argf(token_storage_t *token_storage) {
     if (term_type(token_storage)){
         token_t *name = get_token_keep(token_storage);
         if(term_id(token_storage)) {
-            printf("insertujem\n");
             insert_id(&id_node, name->value, convert_char_to_datatype(datatype->value), scope);
             fun_add_arg(id_node, scope, convert_char_to_datatype(datatype->value));
             return 1;
