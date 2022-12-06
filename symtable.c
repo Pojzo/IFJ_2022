@@ -151,41 +151,19 @@ int fun_add_return_type(id_node_t* node, char* scope, datatype_t datatype) {
     return 0;
 }
 
-//toto pojde do matky p boa (asi)
-/*
-bool is_equal(char* a, char* b){
-    int i = 0;
-    while(a[i] != '\0' && b[i] != '\0'){
-        if(a[i] != b[i]){
-            return false;
-        }
-        i++;
-    }
-    if(a[i] == '\0' && b[i] == '\0'){
-        return true;
-    }
-    else{
-        return false;
-    }
-}
-*/
-
 void free_tree(id_node_t* node){
-    if(node == NULL){
-        // free node->arguments, which is array of enum datatype
-        for (int i = 0; i < node->num_arguments; i++) {
-            free(node->arguments[i]);
+    if(node != NULL){
+        if (node->arguments != NULL) {
+            free(node->arguments);
         }
-        free(node->arguments);
-        // finish the lyrics: Fool me one time shame on you, fool me twice can't put the blame on you
-        // fool me three times, fuck the peace sign, I'ma put the blame on you
+        
+        free_tree(node->left);
+        free_tree(node->right);
+        free(node);
+        node->arguments = NULL;
+        node = NULL;
 
-        return;
     }
-    
-    free_tree(node->left);
-    free_tree(node->right);
-    free(node);
 }
 
 //function that prints all nodes of tree

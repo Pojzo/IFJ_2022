@@ -54,7 +54,7 @@ void list_insert_first(list_t **list, symbol_enum symbol) {
 
     new->next = *list;
     *list = new;
-}
+    }
 
 void list_insert_after_nonterm(list_t **list) {
     assert_not_null(list);

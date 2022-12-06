@@ -66,6 +66,7 @@ bool rule_expr(token_storage_t *token_storage) {
     symbol_enum symbol3 = INT;
     int numsym;
 
+    int error = 0;
 
     assoc_t prec_operator; 
     bool input_loaded = false;
@@ -101,18 +102,21 @@ bool rule_expr(token_storage_t *token_storage) {
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {        
             if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){
-                return 0;
+                error = 0;
+                goto end;
             }
             if(rule_check(&symbol1, &symbol2, &symbol3, numsym))
             {        
                 list_insert_first(&list, NONTERM);
                 print_list(list);
                 if (input_loaded && final_condition(list)) {
-                    return 1;
+                    error = 1;
+                    goto end;
                 }
             }
             else {
-                return 0;
+                error = 0;
+                goto end;
             }
         }
         // <
@@ -136,14 +140,17 @@ bool rule_expr(token_storage_t *token_storage) {
 
         }
         else if (prec_operator == ERR) {
-            return 0;
-            // TODO err
+            error = 0;
+            goto end;
         }
         else if (prec_operator == END) {
-            return 1;
+            error = 1;
+            goto end;
         }
     }
-    return 1;
+    end:
+    list_free(list);
+    return error;
 } 
 
 
