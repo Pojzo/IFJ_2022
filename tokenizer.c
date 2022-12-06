@@ -498,6 +498,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 }
 
 
+
 // start state
 state state_start(char c){
     if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {

@@ -45,6 +45,7 @@ const int prec_table[N][N] =
 
 
 
+/*
 bool rule_expr(token_storage_t *token_storage) {
     static int num_calls = 0;
     for (int i = 0; i< 50; i++) {
@@ -56,7 +57,6 @@ bool rule_expr(token_storage_t *token_storage) {
     //return 1;
     int left_brackets = 0;
     list_t *list = list_init();
-    list_insert_first(&list, DOLLAR);
     symbol_enum input;
     symbol_enum top;
     bool valid;
@@ -64,7 +64,7 @@ bool rule_expr(token_storage_t *token_storage) {
     symbol_enum symbol1 = INT;
     symbol_enum symbol2 = INT;
     symbol_enum symbol3 = INT;
-    int numsym;
+    int numsym = 0;
 
     int error = 0;
 
@@ -86,10 +86,10 @@ bool rule_expr(token_storage_t *token_storage) {
             }
             //MAKE SYMBOL OUT OF TOKEN 
             top = list_get_first_term(&list);
-            input = convert_token_to_symbol(token,&valid);
+            input = convert_token_to_symbol(token, &valid);
             if (valid == 0){
                 input_loaded = 1;
-                continue;
+                input = DOLLAR;
             }
         }
         else {
@@ -98,7 +98,7 @@ bool rule_expr(token_storage_t *token_storage) {
         }
         // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
         prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
-        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d, realny token je %s %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input), get_token_keep(token_storage)->value, input_loaded == true);
+        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d, realny token je %s %d, valid je tato picovina %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input), get_token_keep(token_storage)->value, input_loaded == true, valid);
         // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
         if (prec_operator == L_A) {        
             if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){
@@ -152,6 +152,7 @@ bool rule_expr(token_storage_t *token_storage) {
     list_free(list);
     return error;
 } 
+*/
 
 
 int convert_symbol_to_int(symbol_enum symbol) {
@@ -243,9 +244,16 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
             return NEQ;
         }
     }
+    /*
+    for (int i = 0; i < 50; i++) {
+        printf("Dostal som sa sem s %s\n", token->value);
+    }
+    //
+    
     *valid = 0;
     return NEQ;
 }
+
 
 int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int numsym) {
     if (numsym == 1) {

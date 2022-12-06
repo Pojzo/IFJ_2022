@@ -66,8 +66,8 @@ const char *epilog = "?>";
 
 int main() {
 
-    //char *source = get_buffer();
-    char *source = get_stdin();
+    char *source = get_buffer();
+    //char *source = get_stdin();
     printf("%s", source);
     int error = run(source);
     free(source);

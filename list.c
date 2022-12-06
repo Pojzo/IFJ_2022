@@ -29,7 +29,11 @@ const char *symbol_to_string[] = {
 };
 
 list_t* list_init() {
-    return NULL;
+    list_t *list = malloc(sizeof(list_t));
+    list->symbol = DOLLAR;
+    list->next = NULL;
+
+    return list;
 }
 
 void list_free(list_t *list) {
@@ -48,6 +52,7 @@ void list_insert_first(list_t **list, symbol_enum symbol) {
     new->symbol = symbol;
 
     if (*list == NULL) {
+        printf("tu som sa ani nemal dostat more\n");
         *list = new;
         return;
     }
@@ -100,6 +105,7 @@ void list_pop_first(list_t **list) {
     list_t* todelete = *list;
     *list = todelete->next;
     free(todelete);
+    todelete = NULL;
 }
 
 
@@ -140,8 +146,16 @@ int return_before_stop(list_t** list, symbol_enum* symbol1, symbol_enum* symbol2
         else {
             return 0;
         }
+        
         (*num)++;
+        if (curr == NULL) {
+            return 0;
+        }
+        if (curr->next == NULL) {
+            return 0;
+        }
         curr = curr->next;
+        
     }
     list_pop_first(list);
     if (*num != 1 && *num != 3)

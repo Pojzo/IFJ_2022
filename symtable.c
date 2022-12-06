@@ -48,6 +48,8 @@ int insert_id(id_node_t **node, char* name, datatype_t datatype , char* scope){
         (*node)->right = NULL;
         (*node)->datatype = datatype;
         (*node)->scope = scope;
+        (*node)->arguments = NULL;
+        (*node)->num_arguments = 0;
         //print_tree(*node);
         //pozor pozor, psekulacia 
         return error;
@@ -136,6 +138,9 @@ id_node_t* search(id_node_t* node, char* name){
 
 
 int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype) {
+    if (node == NULL) {
+        return 0;
+    }
     // print the datatype as string
     id_node_t* current = search(node, scope);
     current->num_arguments++;
@@ -151,19 +156,16 @@ int fun_add_return_type(id_node_t* node, char* scope, datatype_t datatype) {
     return 0;
 }
 
-void free_tree(id_node_t* node){
-    if(node != NULL){
-        if (node->arguments != NULL) {
-            free(node->arguments);
-        }
-        
-        free_tree(node->left);
-        free_tree(node->right);
-        free(node);
-        node->arguments = NULL;
-        node = NULL;
 
+// write a function to recursively free the tree
+void free_tree(id_node_t* node) {
+    if (node == NULL) {
+        return;
     }
+    free_tree(node->left);
+    free_tree(node->right);
+    free(node->arguments);
+    free(node);
 }
 
 //function that prints all nodes of tree
