@@ -30,9 +30,11 @@ const char *symbol_to_string[] = {
 
 list_t* list_init() {
     list_t *list = malloc(sizeof(list_t));
+    //list->element = malloc(sizeof(element_t));
+    //list->element->token = NULL;
+    //list->element->symbol = DOLLAR;
     list->symbol = DOLLAR;
     list->next = NULL;
-
     return list;
 }
 
@@ -41,6 +43,7 @@ void list_free(list_t *list) {
     list_t *cur = list;
     while(cur != NULL) {
         list_t *next = cur->next;
+     //   free(cur->element);
         free(cur);
         cur = next;
     }

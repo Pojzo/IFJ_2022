@@ -40,7 +40,6 @@ bool rule_expr(token_storage_t *token_storage) {
         // get current token
         token_t *token = get_token_keep(token_storage);
         int end = check_end(token, &left_brackets);
-        //printf("je to end? %d\n", end);
         if (end == 1) {
             // end of input
             // second part of expression, $ is always on input
@@ -51,6 +50,8 @@ bool rule_expr(token_storage_t *token_storage) {
         bool valid = 1;
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
+
+        //TODO tu spravime aby mali aj value 
 
         // we need to check if input was valid
         if (valid == 0) {
@@ -73,7 +74,6 @@ bool rule_expr(token_storage_t *token_storage) {
 // second part of expression when input end
 bool rule_expr2(list_t **list, token_storage_t* token_storage) {
     while (true) {
-        //printf("som tu %d \n", __LINE__);
         symbol_enum top = list_get_first_term(*list);
         int ret_code = main_alg(list, top, DOLLAR, token_storage, 1);
         if (ret_code == 2) {
@@ -104,7 +104,6 @@ int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t 
     // <
     if (prec_operator == R_A) {
         right_assoc(list, input);
-        //printf("input ended: %d \n", input_ended);
         if (!input_ended) {
             get_token(token_storage);
         }
@@ -141,13 +140,11 @@ void right_assoc(list_t **list, symbol_enum input) {
 
 // > return false if there was an error in the algorithm
 bool left_assoc(list_t **list) {
-    printf("Entering left assoc\n");
     return rule_check(list);
 }
 
 bool rule_check(list_t **list) {
     int num_till_stop = symbols_till_stop(*list);
-    printf("Viktor stromcek: %d\n", num_till_stop);
     if (num_till_stop == 1) {
         // pouzijeme i -> E
         list_pop_first(list);

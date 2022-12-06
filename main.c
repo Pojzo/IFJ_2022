@@ -10,7 +10,7 @@
 const int MAX_BUFFER_LEN = 1000;
 
 const int DEBUG_PARSER = 0;
-const int DEBUG_LEXER = 1;
+const int DEBUG_LEXER = 0;
 
 
 char *get_buffer();
@@ -49,7 +49,6 @@ char *get_buffer() {
 // account for new lines, get the whole input
 
 char *get_stdin() {
-    printf("do pici kokotovej\n");
     char *buffer = malloc(MAX_BUFFER_LEN);
     int c;
     size_t s = 0;
@@ -77,7 +76,6 @@ int main() {
        printf("Running prolog tests\n-------------------\n");
        test_prolog();
        */
-    printf("antoaneta sa v hrobe obraca jak sa sem nedostanem\n");
     printf("Returnujem tento error %d\n", error);
     return error;
 }

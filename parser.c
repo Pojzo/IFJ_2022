@@ -74,8 +74,7 @@ int parser_start(char *buffer) {
 
     // printf("Number of tokens: %d\n", token_storage->num_tokens);
     end:
-    printf("Tu som sa na sto kokotov musel dostat\n");
-    print_tree(id_node);
+    if (DEBUG_PARSER) print_tree(id_node);
     token_storage_free(token_storage);
     free_tree(id_node);
     return error;

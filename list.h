@@ -25,6 +25,12 @@ typedef enum {
     NONTERM,  // E
 } symbol_enum;
 
+/*
+typedef struct Element {
+    symbol_enum symbol;
+    token_t* token;
+} element_t;
+*/
 
 typedef struct List {
     symbol_enum symbol;
