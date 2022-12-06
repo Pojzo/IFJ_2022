@@ -14,20 +14,6 @@ typedef enum {
     END   // end of input
 } assoc_t;
 
-typedef struct {
-    token_t *token;
-    symbol_enum symbol;
-    bool is_expr; 
-    //expr_t *expr;
-} token_symbol_t;
-
-typedef struct {
-    //expr_t *left;
-    //expr_t *right;
-    token_symbol_t* token_symbol;
-} expr_t;
-
-
 #define N 8
 
 const int prec_table[N][N] =
@@ -45,115 +31,156 @@ const int prec_table[N][N] =
 
 
 
-/*
+
 bool rule_expr(token_storage_t *token_storage) {
-    static int num_calls = 0;
-    for (int i = 0; i< 50; i++) {
-        // print num_calls and increment it
-        //printf("%d %s\n", num_calls, get_token_keep(token_storage)->value);
-    }
-    num_calls++;
-    //get_token(token_storage);
-    //return 1;
     int left_brackets = 0;
     list_t *list = list_init();
-    symbol_enum input;
-    symbol_enum top;
-    bool valid;
-
-    symbol_enum symbol1 = INT;
-    symbol_enum symbol2 = INT;
-    symbol_enum symbol3 = INT;
-    int numsym = 0;
-
-    int error = 0;
-
-    assoc_t prec_operator; 
-    bool input_loaded = false;
-
-    while (!input_loaded || !(final_condition(list))) { //TODO 
-        if (!input_loaded) {
-            token_t *token = get_token_keep(token_storage);
-            if (strcmp(token->value, "(") == 0) {
-                left_brackets++;
-            }
-
-            else if (strcmp(token->value, ")") == 0) {
-                left_brackets--;
-                if (left_brackets < 0) {
-                    input_loaded = true;
-                }
-            }
-            //MAKE SYMBOL OUT OF TOKEN 
-            top = list_get_first_term(&list);
-            input = convert_token_to_symbol(token, &valid);
-            if (valid == 0){
-                input_loaded = 1;
-                input = DOLLAR;
-            }
+    while(true) {
+        // get current token
+        token_t *token = get_token_keep(token_storage);
+        int end = check_end(token, &left_brackets);
+        //printf("je to end? %d\n", end);
+        if (end == 1) {
+            // end of input
+            // second part of expression, $ is always on input
+            return rule_expr2(&list, token_storage);
         }
-        else {
-            input = DOLLAR;
-            top = list_get_first_term(&list);
-        }
-        // tuto dame ten oprator ktory budeme musiet pozuit, takze bud <, >, =, x, alebo koniec
-        prec_operator = prec_table[convert_symbol_to_int(top)][convert_symbol_to_int(input)];
-        printf("top je %d, input je %d, operator je %d, konvertovane: %d, %d, realny token je %s %d, valid je tato picovina %d\n", top, input, prec_operator, convert_symbol_to_int(top), convert_symbol_to_int(input), get_token_keep(token_storage)->value, input_loaded == true, valid);
-        // na zaklade toho aky je to operator tak rozhodneme co budeme robit 
-        if (prec_operator == L_A) {        
-            if(!return_before_stop(&list, &symbol1, &symbol2, &symbol3, &numsym)){
-                error = 0;
-                goto end;
-            }
-            if(rule_check(&symbol1, &symbol2, &symbol3, numsym))
-            {        
-                list_insert_first(&list, NONTERM);
-                print_list(list);
-                if (input_loaded && final_condition(list)) {
-                    error = 1;
-                    goto end;
-                }
-            }
-            else {
-                error = 0;
-                goto end;
-            }
-        }
-        // <
-        else if (prec_operator == R_A) {   
-            list_insert_after_nonterm(&list);
-            list_insert_first(&list, input);
-            print_list(list);
-            if(!input_loaded) {
-                get_token(token_storage);
-            }
 
-           
-        }
-        else if (prec_operator == EQ_A) {
-            list_insert_first(&list, input);
-            print_list(list);
-            if(!input_loaded) {
-                get_token(token_storage);
-            }
+        bool valid = 1;
+        symbol_enum top = list_get_first_term(list);
+        symbol_enum input = convert_token_to_symbol(token, &valid);
 
+        // we need to check if input was valid
+        if (valid == 0) {
+            // syntax error
+            return false;
+        }
 
-        }
-        else if (prec_operator == ERR) {
-            error = 0;
-            goto end;
-        }
-        else if (prec_operator == END) {
-            error = 1;
-            goto end;
+        if (!main_alg(&list, top, input, token_storage, 0)) {
+            // this mean that there has been an error in main_alg
+            return false;
         }
     }
-    end:
-    list_free(list);
-    return error;
-} 
-*/
+}
 
+// second part of expression when input end
+bool rule_expr2(list_t **list, token_storage_t* token_storage) {
+    while (true) {
+        //printf("som tu %d \n", __LINE__);
+        symbol_enum top = list_get_first_term(*list);
+        int ret_code = main_alg(list, top, DOLLAR, token_storage, 1);
+        if (ret_code == 2) {
+            // if end
+            return 1;
+        }
+        else if (ret_code == 1) {
+            continue;
+        }
+        else {
+            return 0;
+        }
+    }
+}
+
+int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t *token_storage, bool input_ended) {
+    // printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
+    print_list(*list);
+    // get precedence operator from table
+    int row = convert_symbol_to_int(top); 
+    int col = convert_symbol_to_int(input);
+
+    assoc_t prec_operator = prec_table[row][col];
+    if (prec_operator == ERR) {
+        // error in finding prec_operator
+        return 0;
+    }
+    // <
+    if (prec_operator == R_A) {
+        right_assoc(list, input);
+        //printf("input ended: %d \n", input_ended);
+        if (!input_ended) {
+            get_token(token_storage);
+        }
+        return 1;
+    }
+    else if (prec_operator == L_A) {
+        return left_assoc(list);
+    }
+    else if (prec_operator == EQ_A) {
+        eq_assoc(list, input);
+        if (!input_ended) {
+            get_token(token_storage);
+        }        
+        return 1; 
+    }
+    // else if (prec_operator == END) {
+    return 2; 
+}
+
+void eq_assoc(list_t **list, symbol_enum input) {
+    list_insert_first(list, input);
+}
+
+// <
+void right_assoc(list_t **list, symbol_enum input) {
+    // find the first nonterm and insert < after it 
+    list_insert_after_nonterm(list);
+
+    // push input on top of the stack
+    list_insert_first(list, input);
+
+    // called function will read the next symbol
+}
+
+// > return false if there was an error in the algorithm
+bool left_assoc(list_t **list) {
+    printf("Entering left assoc\n");
+    return rule_check(list);
+}
+
+bool rule_check(list_t **list) {
+    int num_till_stop = symbols_till_stop(*list);
+    printf("Viktor stromcek: %d\n", num_till_stop);
+    if (num_till_stop == 1) {
+        // pouzijeme i -> E
+        list_pop_first(list);
+        list_pop_first(list);
+        list_insert_first(list, NONTERM);
+        return 1;
+    }
+    else if (num_till_stop == 3) {
+        list_pop_first(list);
+        list_pop_first(list);
+        list_pop_first(list);
+        list_pop_first(list);        
+        list_insert_first(list, NONTERM);
+        return 1;
+    }
+    return 0;    
+}
+
+bool check_end(token_t *token, int *left_brackets) {
+    if (strcmp(token->value, "(") == 0) {
+        (*left_brackets)++;
+        // this is good
+        return 0;
+    }
+    if (strcmp(token->value, ")") == 0) {
+        (*left_brackets)--;
+        if (*left_brackets < 0) {
+            // this is bad, meaning we're reached the end of expr
+            return 1;
+        }
+        return 0;
+    }
+    if (strcmp(token->value, ",") == 0) {
+        return 1;
+    }
+    if (strcmp(token->value, ";") == 0) {
+        return 1;
+    }
+    return 0;
+}
 
 int convert_symbol_to_int(symbol_enum symbol) {
     switch(symbol) {
@@ -244,37 +271,8 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
             return NEQ;
         }
     }
-    /*
-    for (int i = 0; i < 50; i++) {
-        printf("Dostal som sa sem s %s\n", token->value);
-    }
-    //
-    
     *valid = 0;
     return NEQ;
 }
 
 
-int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int numsym) {
-    if (numsym == 1) {
-        if (*symbol1 == INT || *symbol1 == FLOAT || *symbol1 == STRING) {
-            printf("Pouzivam pravidlo ked numsym je jedna\n");
-            return 1;
-        }
-    }
-    if (numsym == 3)
-    {
-        if (*symbol1 == NONTERM && *symbol2 < DOLLAR && *symbol3 == NONTERM) {
-            printf("Pouzival pravidlo operator\n");
-            return 1; 
-            //  TODO dd pouzijeme pravidlo E op E je E neviem ako to pouzijeme thb
-            //  toto asi este rozpiseme pre jeednotlive operacia aby sme spravili ten storm 
-        }
-        if (*symbol1 == OPENBR && *symbol2 == NONTERM && *symbol3 == CLOSEDBR) {
-            printf("Pouzival pravidlo operator\n");
-            return  1; 
-            //  TODO dd pouzijeme pravidlo (E) je E neviem ako to pouzijeme thb
-        }
-    }
-    return 0;
-}

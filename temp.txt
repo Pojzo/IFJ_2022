@@ -104,3 +104,30 @@ bool rule_expr(token_storage_t *token_storage) {
     list_free(list);
     return error;
 } 
+
+
+
+
+int rule_check(symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int numsym) {
+    if (numsym == 1) {
+        if (*symbol1 == INT || *symbol1 == FLOAT || *symbol1 == STRING) {
+            printf("Pouzivam pravidlo ked numsym je jedna\n");
+            return 1;
+        }
+    }
+    if (numsym == 3)
+    {
+        if (*symbol1 == NONTERM && *symbol2 < DOLLAR && *symbol3 == NONTERM) {
+            printf("Pouzival pravidlo operator\n");
+            return 1; 
+            //  TODO dd pouzijeme pravidlo E op E je E neviem ako to pouzijeme thb
+            //  toto asi este rozpiseme pre jeednotlive operacia aby sme spravili ten storm 
+        }
+        if (*symbol1 == OPENBR && *symbol2 == NONTERM && *symbol3 == CLOSEDBR) {
+            printf("Pouzival pravidlo operator\n");
+            return  1; 
+            //  TODO dd pouzijeme pravidlo (E) je E neviem ako to pouzijeme thb
+        }
+    }
+    return 0;
+}

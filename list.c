@@ -59,7 +59,8 @@ void list_insert_first(list_t **list, symbol_enum symbol) {
 
     new->next = *list;
     *list = new;
-    }
+}
+
 
 void list_insert_after_nonterm(list_t **list) {
     assert_not_null(list);
@@ -86,9 +87,9 @@ void list_insert_after_nonterm(list_t **list) {
     }
 }
 
-symbol_enum list_get_first_term(list_t **list) {
+symbol_enum list_get_first_term(list_t *list) {
     assert_not_null(list);
-    list_t *cur = *list;
+    list_t *cur = list;
     while (cur != NULL) {
         if (cur->symbol < STOP) {
             return cur->symbol;
@@ -100,12 +101,14 @@ symbol_enum list_get_first_term(list_t **list) {
     return DOLLAR;
 }
 
-void list_pop_first(list_t **list) {
+symbol_enum list_pop_first(list_t **list) {
     assert_not_null(list);
+    symbol_enum to_return = (*list)->symbol;
     list_t* todelete = *list;
     *list = todelete->next;
     free(todelete);
     todelete = NULL;
+    return to_return;
 }
 
 
@@ -124,6 +127,19 @@ void print_list(list_t *list) {
         cur = cur->next;
     }
     printf("\n");
+}
+
+int symbols_till_stop(list_t* list) {
+    int num = 0;
+    while(list->symbol != STOP) {
+        num++;
+        list = list->next;
+        if (list == NULL) {
+            // nieco sa vazne pokazilo
+            return -1;
+        }
+    }
+    return num;
 }
 
 int return_before_stop(list_t** list, symbol_enum* symbol1, symbol_enum* symbol2, symbol_enum* symbol3, int* num) {
