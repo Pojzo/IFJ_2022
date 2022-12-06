@@ -88,7 +88,7 @@ int parser_start(char *buffer) {
     if (DEBUG_PARSER) print_tree(id_node);
     token_storage_free(token_storage);
     free_tree(id_node);
-    return 1;
+    return error;
 }
 
 

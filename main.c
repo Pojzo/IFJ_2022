@@ -61,7 +61,6 @@ char *get_stdin() {
     return buffer;
 }
 
-
 const char *prolog = "<?php";
 const char *epilog = "?>";
 
