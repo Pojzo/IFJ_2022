@@ -31,20 +31,24 @@ const int prec_table[N][N] =
 
 
 
+bool moved_input;
 
 bool rule_expr(token_storage_t *token_storage) {
+    moved_input = true;
     int left_brackets = 0;
     list_t *list = list_init();
     int error = false;
     while(true) {
         // get current token
         token_t *token = get_token_keep(token_storage);
-        int end = check_end(token, &left_brackets);
-        if (end == 1) {
-            // end of input
-            // second part of expression, $ is always on input
-            error = rule_expr2(&list, token_storage);
-            goto end;
+        if (moved_input) {
+            int end = check_end(token, &left_brackets);
+            if (end == 1) {
+                // end of input
+                // second part of expression, $ is always on input
+                error = rule_expr2(&list, token_storage);
+                goto end;
+            }
         }
 
         bool valid = 1;
@@ -59,15 +63,15 @@ bool rule_expr(token_storage_t *token_storage) {
             error = false;
             goto end;
         }
-
         if (!main_alg(&list, top, input, token_storage, 0)) {
             // this mean that there has been an error in main_alg
             error = false;
             goto end;
         }
     }
-    end:
+end:
     list_free(list);
+    printf("Pocet zatvoriek na konci %d\n", left_brackets);
     return error;
 }
 
@@ -90,7 +94,7 @@ bool rule_expr2(list_t **list, token_storage_t* token_storage) {
 }
 
 int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t *token_storage, bool input_ended) {
-    // printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
+    printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
     print_list(*list);
     // get precedence operator from table
     int row = convert_symbol_to_int(top); 
@@ -104,15 +108,18 @@ int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t 
     // <
     if (prec_operator == R_A) {
         right_assoc(list, input);
+        moved_input = true;
         if (!input_ended) {
             get_token(token_storage);
         }
         return 1;
     }
     else if (prec_operator == L_A) {
+        moved_input = false;
         return left_assoc(list);
     }
     else if (prec_operator == EQ_A) {
+        moved_input = true;
         eq_assoc(list, input);
         if (!input_ended) {
             get_token(token_storage);
@@ -145,6 +152,7 @@ bool left_assoc(list_t **list) {
 
 bool rule_check(list_t **list) {
     int num_till_stop = symbols_till_stop(*list);
+    printf("Viktor stromcek: %d\n", num_till_stop);
     if (num_till_stop == 1) {
         // pouzijeme i -> E
         list_pop_first(list);
@@ -165,12 +173,14 @@ bool rule_check(list_t **list) {
 
 bool check_end(token_t *token, int *left_brackets) {
     if (strcmp(token->value, "(") == 0) {
+        printf("Pridavam lavu zatvorku\n");
         (*left_brackets)++;
         // this is good
         return 0;
     }
     if (strcmp(token->value, ")") == 0) {
         (*left_brackets)--;
+        printf("Uberam pravu zatvorku\n");
         if (*left_brackets < 0) {
             // this is bad, meaning we're reached the end of expr
             return 1;
@@ -241,24 +251,24 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
     int length = strlen(token->value);
     if (length == 1) {
         switch (token->value[0]) {
-        case '*':
-            return MUL;
-        case '/':
-            return DIV;
-        case '+':
-            return ADD;
-        case '-':
-            return SUB;
-        case '.':
-            return CONC;
-        case '<':
-            return LT;
-        case '>':
-            return GT;
-        case '(':
-            return OPENBR;
-        case ')':
-            return CLOSEDBR;
+            case '*':
+                return MUL;
+            case '/':
+                return DIV;
+            case '+':
+                return ADD;
+            case '-':
+                return SUB;
+            case '.':
+                return CONC;
+            case '<':
+                return LT;
+            case '>':
+                return GT;
+            case '(':
+                return OPENBR;
+            case ')':
+                return CLOSEDBR;
         }
     }
     else {
