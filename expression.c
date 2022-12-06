@@ -5,6 +5,7 @@
 #include "expression.h"
 #include "tokenizer.h"
 #include "list.h"
+#include "symtable.h"
 
 typedef enum {
     L_A, // left association >
@@ -15,6 +16,10 @@ typedef enum {
 } assoc_t;
 
 #define N 8
+
+extern id_node_t *id_node;
+extern int error;
+extern char *scope;
 
 const int prec_table[N][N] =
 {
@@ -54,7 +59,7 @@ bool rule_expr(token_storage_t *token_storage) {
         bool valid = 1;
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
-
+        
         //TODO tu spravime aby mali aj value 
 
         // we need to check if input was valid
