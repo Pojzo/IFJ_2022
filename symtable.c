@@ -120,6 +120,12 @@ int check_if_declared(id_node_t* node, char* name, char* scope){
     }
 }
 
+
+
+
+
+
+//explicitne pre funkcie funguje
 id_node_t* search(id_node_t* node, char* name){
     if(node == NULL){
         return 0;

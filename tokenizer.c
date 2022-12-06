@@ -435,14 +435,29 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (is_digit(current_char)) {
                     token_value_len++;
                     i++;
-                    current_state = STATE_LIT_NUM_FLOAT;
+                    current_state = STATE_LIT_NUM_FLOAT_2;
                 }
                 else {
+                    //mam cislo a bodku a dostal som nieco ine ako cislo
                     //token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_ERROR;
 
                 }
                 break;
+
+            case STATE_LIT_NUM_FLOAT_2:
+                if (is_digit(current_char)) {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM_FLOAT_2;
+                }
+                else{
+                    //mam cislo, bodku a cislo, a dostal som nieco ine ako
+                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
+                    current_state = STATE_START;
+                }
+                break;
+
             
             case STATE_LIT_STR:
             // "..

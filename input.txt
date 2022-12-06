@@ -1,6 +1,4 @@
 <?php
 declare(strict_types=1);
 
-function f(int $x):void{
-    $x = ($kokotko + $picmaus - ($koko / 5));
- }
+$ahoj = 3.4;
