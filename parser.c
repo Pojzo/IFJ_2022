@@ -11,7 +11,6 @@
 
 int token_index = 0;
 int error = 0;
-int redefinition = 0;
 extern const char *prolog;
 extern const int DEBUG_PARSER;
 extern const int DEBUG_LEXER;
@@ -70,10 +69,7 @@ int parser_start(char *buffer) {
     // check if declare(strict_types=1) is present
     if (!rule_program(token_storage)) {
         printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
-        if (redefinition != 0){
-            error = 3;
-        }
-        else{
+        if (error == 0) {
             error = 2;
         }
         goto end;
@@ -447,7 +443,7 @@ bool rule_fdef (token_storage_t *token_storage) {
         // toto znamena ze tato funkcia uz bola definovana
         if (insert_function_id(&id_node, fun_name->value) == 3) {
             printf("sme tu brasko vydrbalo nas\n");
-            redefinition = 3;
+            error = 3;
             return 0;
         }
 

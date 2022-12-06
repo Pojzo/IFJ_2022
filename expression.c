@@ -59,7 +59,14 @@ bool rule_expr(token_storage_t *token_storage) {
         bool valid = 1;
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
-        
+
+        if (token->token_type == TOK_ID) {
+            if (!check_if_declared(id_node, token->value, scope)) {
+                error = 5;
+                return false;
+            }
+        }
+
         //TODO tu spravime aby mali aj value 
 
         // we need to check if input was valid
