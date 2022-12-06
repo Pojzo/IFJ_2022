@@ -385,7 +385,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                     current_state = STATE_LIT_NUM_FLOAT_E;
                 }
-                else if (current_char == '.') {
+                else if (current_char == '.' /*&& is_digit(source[i+1])*/) {
                     token_value_len++;
                     i++;
                     current_state = STATE_LIT_NUM_FLOAT;
@@ -438,8 +438,8 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_NUM_FLOAT;
                 }
                 else {
-                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
-                    current_state = STATE_START;
+                    //token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
+                    current_state = STATE_ERROR;
 
                 }
                 break;
@@ -453,7 +453,10 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 }
 
                 if (DEBUG_LEXER) debug_print_state("STATE_LIT_STR", start_ptr, token_value_len);
-                if (current_char == '"') {
+                if (current_char == '$' && source[i-1] != '\\'){
+                    current_state = STATE_ERROR;
+                }
+                else if (current_char == '"') {
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
                     i++;

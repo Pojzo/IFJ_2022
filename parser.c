@@ -31,6 +31,7 @@ int parser_start(char *buffer) {
     token_index = 0;
     // we first check if <? is present
 
+    token_storage_t *token_storage = token_storage_create();
     int error = 0;
     if (!check_prolog(buffer)) {
         printf("\x1b[31m" "Error in checking prolog" "\x1b[0m" "\n");
@@ -39,11 +40,9 @@ int parser_start(char *buffer) {
     }
     buffer += strlen(prolog);
 
-    token_storage_t *token_storage = token_storage_create();
     error = dka(buffer, strlen(buffer), token_storage);
 
     // check if there was an error in lexical analysis
-    
     if (DEBUG_LEXER) {
         token_t *token = NULL;
         while ((token = get_token(token_storage)) != NULL) {

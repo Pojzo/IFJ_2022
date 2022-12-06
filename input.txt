@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
-/* hello there!!!
 
-:)
+function f(int $x):void{
+ $x= 9 *9 + 45 - 93 + 34 / 43 + $pojzovKokot;
+ }
