@@ -49,6 +49,7 @@ char *get_buffer() {
 // account for new lines, get the whole input
 
 char *get_stdin() {
+    printf("do pici kokotovej\n");
     char *buffer = malloc(MAX_BUFFER_LEN);
     int c;
     size_t s = 0;
@@ -56,7 +57,8 @@ char *get_stdin() {
         buffer[s] = c;
         s++;
     }
-    buffer[s] = '\0';
+    buffer[s] = '\n';
+    printf("Na konci %s to newline\n", buffer[s] == '\n' ? "je" : "nie je ");
     return buffer;
 }
 
@@ -66,8 +68,8 @@ const char *epilog = "?>";
 
 int main() {
 
-    char *source = get_buffer();
-    //char *source = get_stdin();
+    // char *source = get_buffer();
+    char *source = get_stdin();
     printf("%s", source);
     int error = run(source);
     free(source);
@@ -76,6 +78,7 @@ int main() {
        test_prolog();
        */
     printf("antoaneta sa v hrobe obraca jak sa sem nedostanem\n");
+    printf("Returnujem tento error %d\n", error);
     return error;
 }
 

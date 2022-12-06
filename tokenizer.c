@@ -249,7 +249,10 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             // /*....
             case STATE_COMMENT_MULTI:
                 if (DEBUG_LEXER) debug_print_state("STATE_COMMENT_MULTI", start_ptr, token_value_len);
-                if (current_char == '*') {
+                if(i == source_len -1){
+                    current_state = STATE_ERROR;
+                }
+                else if (current_char == '*') {
                     current_state = STATE_COMMENT_MULTI2;
                     i++;
                     token_value_len++;

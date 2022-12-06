@@ -1,5 +1,5 @@
 <?php
 declare(strict_types=1);
-function pomeDoToho(int $arg1, string $arg2, int $kokoti, int $ahoj): void {
-    $i = $hovienko + $marek * $davidko;
-}
+/* hello there!!!
+
+:)
