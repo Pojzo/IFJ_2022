@@ -35,6 +35,7 @@ const int prec_table[N][N] =
 bool rule_expr(token_storage_t *token_storage) {
     int left_brackets = 0;
     list_t *list = list_init();
+    int error = false;
     while(true) {
         // get current token
         token_t *token = get_token_keep(token_storage);
@@ -43,7 +44,8 @@ bool rule_expr(token_storage_t *token_storage) {
         if (end == 1) {
             // end of input
             // second part of expression, $ is always on input
-            return rule_expr2(&list, token_storage);
+            error = rule_expr2(&list, token_storage);
+            goto end;
         }
 
         bool valid = 1;
@@ -53,14 +55,19 @@ bool rule_expr(token_storage_t *token_storage) {
         // we need to check if input was valid
         if (valid == 0) {
             // syntax error
-            return false;
+            error = false;
+            goto end;
         }
 
         if (!main_alg(&list, top, input, token_storage, 0)) {
             // this mean that there has been an error in main_alg
-            return false;
+            error = false;
+            goto end;
         }
     }
+    end:
+    list_free(list);
+    return error;
 }
 
 // second part of expression when input end
