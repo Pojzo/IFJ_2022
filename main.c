@@ -1,3 +1,11 @@
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -9,7 +17,7 @@
 
 const int MAX_BUFFER_LEN = 10000;
 
-const int DEBUG_PARSER = 0;
+const int DEBUG_PARSER = 1;
 const int DEBUG_LEXER = 0;
 
 

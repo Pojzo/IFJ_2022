@@ -1,7 +1,16 @@
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #include <stdio.h>
 #include "utils.h"
 #include <string.h> 
 #include <stdlib.h>
+
 
 bool is_digit(char c) {
     return c >= 48 && c <= 57;
@@ -48,14 +57,5 @@ void debug_print_state(const char *state_name, const char *string_ptr, int strin
     printf(" %d\n", string_length);
 }
 
-//fucntion appends string into given array
-/*void arg_append(char **args, char *arg) {
-    int i = 0;
-    while (args[i] != '\0') {
-        i++;
-    }
-    realloc(args, (i + 1) * sizeof(char *));
-    args[i] = arg; 
-    
-}*/
+
 

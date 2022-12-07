@@ -1,3 +1,11 @@
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

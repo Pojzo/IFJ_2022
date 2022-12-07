@@ -1,3 +1,11 @@
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #ifndef SYMTABLE_H
 #define SYMTABLE_H
 #include <stdbool.h>

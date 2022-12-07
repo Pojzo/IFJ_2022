@@ -1,3 +1,12 @@
+
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +47,7 @@ int insert_function_id(id_node_t **node, char *name)
 }
 
 // inserting ID
-// funckia sa bude volat iba v priradeni v parseri
+// function will be called only in parser
 int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
 {
     // if inserting root
@@ -61,26 +70,24 @@ int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
         // pozor pozor, psekulacia
         return error;
     }
-    // ked je vacsie idem do lava
+    // if bigger, go left
     if (is_bigger((*node)->name, name))
     {
         insert_id(&(*node)->left, name, datatype, scope);
     }
-    // ked je mensie idem do prava
+    // if smaller, go right
     else if (is_bigger(name, (*node)->name))
     {
         insert_id(&(*node)->right, name, datatype, scope);
     }
-    // ak sa rovnaju mena a aj scope
+    //
     else if (strcmp((*node)->scope, scope) == 0)
     {
-        // pokus o redefiniciu premennej v ramci scope s inym datovym typom
         if ((*node)->datatype != datatype)
         {
             (*node)->datatype = datatype;
         }
     }
-    // ak sa rovnaju mena id ale scope nie
     else
     {
         printf("PREPADLI SME SEM BRASKO POMOC\n");

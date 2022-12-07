@@ -1,3 +1,11 @@
+/*
+ * IFJ2022
+ * autori:
+ * xgazdi04 - Matus Gazdík
+ * xjokay00 - David Jokay
+ * xkovac66 - Peter Kováč
+ * xbuchm02 - Marek Buch
+ */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,7 +39,7 @@ extern const int DEBUG_PARSER;
 
 bool terminated_string = false;
 
-//static inline const unsigned char a = 0;
+
 
 //fucntion checks whether string is keyword 
 bool is_keyword(char *start_ptr, int token_value_len){
@@ -121,19 +129,12 @@ void token_storage_free(token_storage_t *token_storage) {
 // ADDED
 // adds token to token array
 void token_storage_add(token_storage_t *token_storage, tok_type token_type, char *start_ptr, int token_value_len) {
-    // static int num_added = 0;
-    // print the text in blue 
-    // then reset to black
-    // printf("\033[0;34m" "Added token: %s - %d\n" "\033[0m", start_ptr, num_added++);
-    // create new token
     token_t *token = token_create(token_type, start_ptr, token_value_len);
     if (token == NULL) {
         // TODO tu dame nejaky error
     }
 
-    // if num_tokens == array_len - if number of tokens is equal to the number of allocated space, we should inflate the
-    // array
-
+    // if there is no space in the array, reallocate it
     if (token_storage->num_tokens + 1 == token_storage->array_len) {
         // increase the size by 2 to avoid too many reallocs
         token_storage->array_len *= 2;
@@ -166,6 +167,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 token_value_len = 1;
                 current_state = state_start(current_char);
                 break;
+
 
             case STATE_ID_START:
                 if (DEBUG_LEXER) debug_print_state("STATE_ID_START", start_ptr, token_value_len);
@@ -290,7 +292,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             case STATE_EQUAL_1:
                 // =...
                 // token_value_len = 2;
-                //ukazujeme na druheho debila
                 if (DEBUG_LEXER) debug_print_state("STATE_EQUAL_1", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_value_len++;
@@ -311,7 +312,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                 }
                 else {
-                    //do toho erroru
                     current_state = STATE_ERROR;
                 }
                 break;
@@ -442,8 +442,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_NUM_FLOAT_2;
                 }
                 else {
-                    //mam cislo a bodku a dostal som nieco ine ako cislo
-                    //token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_ERROR;
 
                 }
@@ -461,7 +459,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_NUM_FLOAT_E;
                 }
                 else{
-                    //mam cislo, bodku a cislo, a dostal som nieco ine ako
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
                 }
@@ -699,6 +696,7 @@ state state_id_start(char c) {
     }
     return STATE_ERROR; 
 }
+
 
 state state_id_main(char c) {
     if (is_alpha(c) || is_digit(c) || c == '_') {
