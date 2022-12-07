@@ -298,7 +298,7 @@ bool rule_check(list_t **list, bool is_string) {
 
 bool compatible_operands(symbol_enum operator, bool is_string) {
     if (is_string) {
-        if (operator != CONC && operator != EQ && operator != NEQ && operator != NONTERM) {
+        if (operator != CONC && operator != EQ && operator != NEQ && operator != NONTERM && operator != GTE && operator != LTE && operator != GT && operator != LT) {
             error = 7;
             return 0;
         }

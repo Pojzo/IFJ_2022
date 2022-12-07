@@ -1,6 +1,3 @@
 <?php
 declare(strict_types=1);
-
-function f(int $v, ?float $v): void {
-}
-f(5, null);
+if (0 >= null) {} else { write("fail 0 >= null\n"); }
