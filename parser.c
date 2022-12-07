@@ -366,22 +366,6 @@ bool term_idfun_call(token_storage_t *token_storage) {
         // return true;
     }
     return false;
-    /*
-    token_t *token = get_token_keep(token_storage);
-    if (token == NULL) {
-        return false;
-    }
-
-    if (token->token_type == TOK_ID && token->value[0] != '$') {
-        if (search(id_node, token->value) != NULL) {
-            get_token(token_storage);
-            return true;
-        }
-        error = 3;
-        return false;
-    }
-    return false;
-    */
 }
 
 bool rule_st(token_storage_t *token_storage) {
@@ -475,23 +459,63 @@ bool rule_funccallarg(token_storage_t *token_storage, char *function_name) {
         return 1;
     }
     datatype_t datatype = TYPE_VOID;
-    if (rule_expr(token_storage, &datatype,1) && rule_next(token_storage, anticipated_args, 1, function_name) && term_semicolon(token_storage)) {
-        return 1;
+    if (rule_expr(token_storage, &datatype, 1)) {
+        printf("%d %d %d\n", function->num_arguments, function->num_arguments, function->num_arguments);
+        if (function->num_arguments != 0 && function->arguments[0] == TYPE_OPT_INT && (datatype == TYPE_INT || datatype == TYPE_VOID)) {
+            goto skip;
+        }
+        if (function->num_arguments != 0 && function->arguments[0] == TYPE_OPT_FLOAT && (datatype == TYPE_FLOAT || datatype == TYPE_VOID)) {
+            goto skip;
+        }
+
+        if (function->num_arguments != 0 && function->arguments[0] == TYPE_OPT_STRING && (datatype == TYPE_STRING || datatype == TYPE_VOID)) {
+            goto skip;
+        }
+
+        if (strcmp("write", function_name) != 0 && datatype != function->arguments[0]) {
+            error = 4;
+            return 0;
+        }
+ skip:
+        if (rule_next(token_storage, anticipated_args, 1, function) && term_semicolon(token_storage)) {
+            return 1;
+        }
     }
     return 0;
 }
 
-bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_args, char *function_name) {
+bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_args, id_node_t *function) {
     if (term_close_bracket(token_storage)) {
-        if(curr_args != anticipated_args && strcmp(function_name, "write") != 0) {
+        if(curr_args != anticipated_args && strcmp(function->name, "write") != 0) {
             error = 4;
             return 0;
         }
         return 1;
     }
     datatype_t datatype = TYPE_VOID;
-    if (term_comma(token_storage) && rule_expr(token_storage, &datatype, 0) && rule_next(token_storage, anticipated_args, curr_args + 1, function_name)) {
-        return 1;
+    if (term_comma(token_storage)) {
+        if (rule_expr(token_storage, &datatype, 0)) {
+            printf("curr args: %d, pocet: %d\n", curr_args, function->num_arguments);
+            if (function->num_arguments > curr_args && function->arguments[curr_args] == TYPE_OPT_INT && (datatype == TYPE_INT || datatype == TYPE_VOID)) {
+                goto skip;
+            }
+
+            if (function->num_arguments > curr_args && function->arguments[curr_args] == TYPE_OPT_FLOAT && (datatype == TYPE_FLOAT || datatype == TYPE_VOID)) {
+                goto skip;
+            }
+
+            if (function->num_arguments > curr_args && function->arguments[curr_args] == TYPE_OPT_STRING && (datatype == TYPE_STRING || datatype == TYPE_VOID)) {
+                goto skip;
+            }
+            if (strcmp("write", function->name) != 0 && datatype != function->arguments[curr_args]) {
+                error = 4;
+                return 0;
+            }
+skip:
+            if (rule_next(token_storage, anticipated_args, curr_args + 1, function)) {
+                return 1;
+            }
+        }
     }
     return 0;
 }
@@ -506,16 +530,16 @@ bool rule_fdef (token_storage_t *token_storage) {
         }
 
         if (term_idfun(token_storage, true) && term_open_bracket(token_storage) && rule_function_arguments(token_storage) && 
-            term_colon(token_storage)) {
-            
+                term_colon(token_storage)) {
+
             token_t *token = get_token_keep(token_storage);
             fun_add_return_type(id_node, fun_name->value, convert_char_to_datatype(token->value));
             if(term_type(token_storage) && term_open_curly_bracket(token_storage) &&
-                rule_function_body(token_storage)) {
-            //insert_function_id(id_node, scope, return_type, arguments);
+                    rule_function_body(token_storage)) {
+                //insert_function_id(id_node, scope, return_type, arguments);
                 scope = "global";
                 if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
-                    return 1;
+                return 1;
             }
         }
     }
@@ -578,7 +602,7 @@ bool rule_return_cond(token_storage_t* token_storage) {
         }
         return 1;
     }
-    
+
     if (rule_expr(token_storage, &expr_datatype, 1) && term_semicolon(token_storage)) {
         if (strcmp(scope, "global") == 0) {
             return 1;

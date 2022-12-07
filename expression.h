@@ -30,6 +30,6 @@ bool term_idfun_call_alt(token_storage_t *token_storage);
 bool term_open_bracket_alt(token_storage_t *token_storage);
 bool term_close_bracket_alt(token_storage_t *token_storage);
 bool rule_funccallarg_alt(token_storage_t *token_storage, char *function_name);
-bool rule_next_expr_alt(token_storage_t *token_storage, int anticipated_args, int curr_args, char *function_name);
+bool rule_next_expr_alt(token_storage_t *token_storage, int anticipated_args, int curr_args, id_node_t *function_name);
 bool term_comma_alt(token_storage_t *token_storage);
 #endif

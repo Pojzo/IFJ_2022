@@ -1,3 +1,6 @@
 <?php
 declare(strict_types=1);
-$x = 1.7976931348623157E+308;
+
+function f(int $v, ?float $v): void {
+}
+f(5, null);

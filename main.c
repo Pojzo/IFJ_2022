@@ -17,8 +17,8 @@
 
 const int MAX_BUFFER_LEN = 10000;
 
-const int DEBUG_PARSER = 0;
-const int DEBUG_LEXER = 1;
+const int DEBUG_PARSER = 1;
+const int DEBUG_LEXER = 0;
 
 
 char *get_buffer();
@@ -74,7 +74,7 @@ const char *epilog = "?>";
 
 int main() {
 
-    // char *source = get_buffer();
+    //char *source = get_buffer();
     char *source = get_stdin();
     printf("%s", source);
     int error = run(source);

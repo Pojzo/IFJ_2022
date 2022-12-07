@@ -127,10 +127,12 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype, bool
             }
 
         }
+        else if (token->token_type == TOK_KEYWORD && strcmp(token->value, "null") == 0) {
+            input = VOID;
+        }
         else {
             input = convert_token_to_symbol(token, &valid);
         }
-
         if (input == INT || input == FLOAT || input == STRING) {
             if (type == NONTERM) {
                 type = input;
@@ -153,7 +155,7 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype, bool
             }
         }
 
-        //TODO tu spravime aby mali aj value 
+        
 
         // we need to check if input was valid
         if (valid == 0) {
@@ -209,10 +211,16 @@ int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t 
     // printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
     // print_list(*list);
     // get precedence operator from table
-    int row = convert_symbol_to_int(top); 
-    int col = convert_symbol_to_int(input);
+    assoc_t prec_operator;
+    if (input == VOID) {
+        prec_operator = R_A;
+    }
+    else {
+        int row = convert_symbol_to_int(top); 
+        int col = convert_symbol_to_int(input);
+        prec_operator = prec_table[row][col];
+    }
 
-    assoc_t prec_operator = prec_table[row][col];
     if (prec_operator == ERR) {
         // error in finding prec_operator
         return 0;
@@ -372,32 +380,9 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
         return INT;
     }
 
-    // function
-    if ((token->token_type == TOK_ID) && (token->value[0] != '$')){
-        datatype_t datatype = search_return_type(id_node, token->value);
-        symbol_enum symbol = INT;
-        (void) symbol;
-        switch(datatype) {
-            case TYPE_INT:
-            case TYPE_OPT_INT:
-                symbol = INT;
-                break;
-            case TYPE_FLOAT:
-            case TYPE_OPT_FLOAT:
-                symbol = FLOAT;
-                break;
-            case TYPE_STRING:
-            case TYPE_OPT_STRING:
-                symbol = STRING;
-                break;
-            case TYPE_VOID:
-                symbol = VOID;
-                break;
-        }
-
-        // call function rule
-
-    } 
+    if (token->token_type == TOK_KEYWORD && strcmp(token->value, "null") == 0) {
+        return VOID;
+    }
 
     if (token->token_type == TOK_LIT) {
         if (token->value[0] == '"') {
@@ -467,8 +452,6 @@ bool contains_dot(char *str) {
     return false;
 }
 
-
-
 bool rule_funccallarg_alt(token_storage_t *token_storage, char *function_name) {
     id_node_t *function = search(id_node, function_name);
     int anticipated_args = function->num_arguments;
@@ -480,26 +463,43 @@ bool rule_funccallarg_alt(token_storage_t *token_storage, char *function_name) {
         return 1;
     }
     datatype_t datatype;
-    if (rule_expr(token_storage, &datatype, 1) && rule_next_expr_alt(token_storage, anticipated_args, 1, function_name)) {
-        return 1;
+    if (rule_expr(token_storage, &datatype, 1)) {
+        if (strcmp(function->name, "write") != 0 && datatype != function->arguments[0]) {
+            error = 4;
+            return 0;
+        }
+        
+        if (rule_next_expr_alt(token_storage, anticipated_args, 1, function)) {
+            return 1;
+        }
     }
     return 0;
 }
 
-bool rule_next_expr_alt(token_storage_t *token_storage, int anticipated_args, int curr_args, char *function_name) {
+bool rule_next_expr_alt(token_storage_t *token_storage, int anticipated_args, int curr_args, id_node_t *function) {
     if (term_close_bracket_alt(token_storage)) {
-        if(curr_args != anticipated_args && strcmp(function_name, "write") != 0) {
+        if(curr_args != anticipated_args && strcmp(function->name, "write") != 0) {
             error = 4;
             return 0;
         }
         return 1;
     }
     datatype_t datatype = TYPE_VOID;
-    if (term_comma_alt(token_storage) && rule_expr(token_storage, &datatype, 0) && rule_next_expr_alt(token_storage, anticipated_args, curr_args + 1, function_name)) {
-        return 1;
+    if (term_comma_alt(token_storage)) {
+        if (rule_expr(token_storage, &datatype, 0)) {
+            if (strcmp("write", function->name) != 0 && datatype != function->arguments[curr_args]) {
+                error = 4;
+                return 0;
+            }
+            if (rule_next_expr_alt(token_storage, anticipated_args, curr_args + 1, function)) {
+                return 1;
+            }
+        }
     }
     return 0;
 }
+
+
 
 bool term_open_bracket_alt(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);

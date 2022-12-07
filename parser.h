@@ -24,7 +24,7 @@ bool rule_stlist(token_storage_t *token_storage);
 bool rule_fstlist(token_storage_t *token_storage);
 bool rule_else(token_storage_t *token_storage);
 bool rule_funccallarg(token_storage_t *token_storage, char *value);
-bool rule_next(token_storage_t *token_storage, int, int, char *);
+bool rule_next(token_storage_t *token_storage, int, int, id_node_t *node);
 bool term_if(token_storage_t *token_storage);
 bool term_while(token_storage_t *token_storage);
 bool term_open_bracket(token_storage_t *token_storage);
