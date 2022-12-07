@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
-function koko(int $pojzo): int {
-    $x = $pojzo;
+
+function ja () : ?string{
+$x = 5;
 }
+

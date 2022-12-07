@@ -7,10 +7,10 @@
 #include "parser.h"
 #include "tokenizer.h"
 
-const int MAX_BUFFER_LEN = 1000;
+const int MAX_BUFFER_LEN = 10000;
 
-const int DEBUG_PARSER = 0;
-const int DEBUG_LEXER = 1;
+const int DEBUG_PARSER = 1;
+const int DEBUG_LEXER = 0;
 
 
 char *get_buffer();

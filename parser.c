@@ -330,7 +330,8 @@ bool term_idfun(token_storage_t *token_storage, bool is_fdef) {
 bool term_type(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
     if (token != NULL && token->token_type == TOK_KEYWORD) {
-        if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0 || strcmp(token->value, "void") == 0) {
+        if(strcmp(token->value, "int") == 0 || strcmp(token->value, "string") == 0 || strcmp(token->value, "float") == 0 || strcmp(token->value, "void") == 0
+        ||strcmp(token->value, "?int") == 0 || strcmp(token->value, "?string") == 0 || strcmp(token->value, "?float") == 0) {
             //char *return_type = token->value;
             get_token(token_storage);
             return 1;
@@ -442,7 +443,6 @@ bool rule_fdef (token_storage_t *token_storage) {
         token_t *fun_name = get_token_keep(token_storage);
         // toto znamena ze tato funkcia uz bola definovana
         if (insert_function_id(&id_node, fun_name->value) == 3) {
-            printf("sme tu brasko vydrbalo nas\n");
             error = 3;
             return 0;
         }
@@ -451,7 +451,9 @@ bool rule_fdef (token_storage_t *token_storage) {
             term_colon(token_storage)) {
             
             token_t *token = get_token_keep(token_storage);
+            printf("tu to to je\n");
             fun_add_return_type(id_node, fun_name->value, convert_char_to_datatype(token->value));
+            printf("uz ne\n");
             if(term_type(token_storage) && term_open_curly_bracket(token_storage) &&
                 rule_function_body(token_storage)) {
             //insert_function_id(id_node, scope, return_type, arguments);

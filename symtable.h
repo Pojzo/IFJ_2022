@@ -5,8 +5,11 @@
 
 typedef enum datatype {
     TYPE_INT,
+    TYPE_OPT_INT,
     TYPE_FLOAT,
+    TYPE_OPT_FLOAT,
     TYPE_STRING,
+    TYPE_OPT_STRING,
     TYPE_VOID
 } datatype_t;
 
