@@ -43,14 +43,12 @@ const int prec_table[N][N] =
 	{ R_A , R_A , R_A ,  R_A  , R_A ,  ERR  , R_A , END }  /// $
 };
 
-
-
-
 bool moved_input;
 extern bool rule_st;
 
-bool rule_expr(token_storage_t *token_storage) {
+bool rule_expr(token_storage_t *token_storage, datatype_t *datatype) {
     printf("tu soms a dostal more gadzo\n");
+    symbol_enum type = NONTERM;
     moved_input = true;
     int left_brackets = 0;
     list_t *list = list_init();
@@ -71,6 +69,11 @@ bool rule_expr(token_storage_t *token_storage) {
         bool valid = 1;
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
+        if (input == INT || input == FLOAT || input == STRING) {
+            if (type == NONTERM) {
+                if () // TODO
+            }
+        }
 
         if (token->token_type == TOK_ID && token->value[0] == '$') {
             if (!check_if_declared(id_node, token->value, scope)) {
@@ -263,13 +266,25 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
         return INT;
     }
 
-    if (((token->token_type == TOK_ID) && (token->value[0] == '$')) || token->token_type == TOK_LIT) {
-        return INT; // sem string alebo int alebo float
+    if ((token->token_type == TOK_ID) && (token->value[0] == '$')){
+        return INT;
+        //return (get_data_t(token));
+    } 
+
+    if (token->token_type == TOK_LIT) {
+        if (token->value[0] == '"') {
+            return STRING;
+        }
+        else if (contains_dot(token->value)) {
+            return FLOAT;
+        }
+        else {
+            return INT;
+        }
     }
 
     if(token->token_type == TOK_ID) {
-        // toto je funkcia
-        // takze s tym nieco este budeme musiet spravit
+        // TODO tunkcia 
         return INT;
     }
 
@@ -314,4 +329,41 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
     return NEQ;
 }
 
+datatype_t token_to_datatyep
 
+/*
+bool rule_funccallarg (token_storage_t *token_storage, char *function_name) {
+    id_node_t *function = search(id_node, function_name);
+    int anticipated_args = function->num_arguments;
+    if (term_close_bracket(token_storage) && term_semicolon(token_storage)) {
+        if (anticipated_args != 0) {
+            error = 4;
+            return 0;
+        }
+        return 1;
+    }
+    if (rule_expr(token_storage) && rule_next(token_storage, anticipated_args, 1, function_name) && term_semicolon(token_storage)) {
+        return 1;
+    }
+    return 0;
+}
+
+bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_args, char *function_name) {
+    if (term_close_bracket(token_storage)) {
+        if(curr_args != anticipated_args && strcmp(function_name, "write") != 0) {
+            error = 4;
+            return 0;
+        }
+        return 1;
+    }
+  if (term_idfun_call(token_storage)) {
+        if(term_open_bracket(token_storage) && rule_funccallarg(token_storage, token->value)) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+
+*/
