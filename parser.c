@@ -61,7 +61,7 @@ int parser_start(char *buffer) {
     else {
         printf("\x1b[32m" "\nLexical analysis was successful\n" "\x1b[0m");
     }
-
+    add_builtin_functions();
     /*insert_function_id(&id_node, "floatval");
     insert_function_id(&id_node, "intval");
     insert_function_id(&id_node, "strval");
@@ -347,16 +347,14 @@ bool term_idfun_call(token_storage_t *token_storage) {
         return false;
     }
     if (token->token_type == TOK_ID && token->value[0] != '$') {
-        /*
         if (search(id_node, token->value) != NULL) {
             get_token(token_storage);
             return true;
         }
         error = 3;
         return false;
-        */
-        get_token(token_storage);
-        return true;
+        // get_token(token_storage);
+        // return true;
     }
     return false;
     /*
@@ -560,3 +558,22 @@ bool rule_return_cond(token_storage_t* token_storage) {
     }
     return 0;
 }
+
+void add_builtin_functions() {
+    insert_function_id(&id_node, "reads");
+    insert_function_id(&id_node, "readi");
+    insert_function_id(&id_node, "readf");
+    insert_function_id(&id_node, "write");
+
+    insert_function_id(&id_node, "floatval");
+    insert_function_id(&id_node, "intval");
+    insert_function_id(&id_node, "strval");
+
+    insert_function_id(&id_node, "strlen");
+    insert_function_id(&id_node, "substring");
+
+    insert_function_id(&id_node, "ord");
+    insert_function_id(&id_node, "chr");
+    return;
+}
+

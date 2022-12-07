@@ -43,6 +43,7 @@ bool term_cond_op(token_storage_t *token_storage);
 bool rule_return_cond(token_storage_t* token_storage);
 bool rule_return_cond_end(token_storage_t* token_storage);
 bool term_idfun_call(token_storage_t *token_storage);
+void add_builtin_functions();
 
 
 

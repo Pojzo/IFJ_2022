@@ -62,7 +62,7 @@ bool rule_expr(token_storage_t *token_storage) {
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
 
-        if (token->token_type == TOK_ID) {
+        if (token->token_type == TOK_ID && token->value[0] == '$') {
             if (!check_if_declared(id_node, token->value, scope)) {
                 // printf("toto sa malo stat\n");
                 error = 5;
@@ -109,8 +109,8 @@ bool rule_expr2(list_t **list, token_storage_t* token_storage) {
 }
 
 int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t *token_storage, bool input_ended) {
-    printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
-    print_list(*list);
+    // printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
+    // print_list(*list);
     // get precedence operator from table
     int row = convert_symbol_to_int(top); 
     int col = convert_symbol_to_int(input);
