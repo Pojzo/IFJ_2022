@@ -120,15 +120,10 @@ int check_if_declared(id_node_t* node, char* name, char* scope){
     }
 }
 
-
-
-
-
-
 //explicitne pre funkcie funguje
 id_node_t* search(id_node_t* node, char* name){
     if(node == NULL){
-        return 0;
+        return NULL;
     }
     if(strcmp(node->name, name) == 0){
         return node;
@@ -140,8 +135,6 @@ id_node_t* search(id_node_t* node, char* name){
         return search(node->right, name);
     }
 }
-
-
 
 int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype) {
     if (node == NULL) {

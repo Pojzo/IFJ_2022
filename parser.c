@@ -317,7 +317,7 @@ bool term_id(token_storage_t *token_storage) {
 
 bool term_idfun(token_storage_t *token_storage, bool is_fdef) {
     token_t *token = get_token_keep(token_storage);
-   if (token != NULL && token->token_type == TOK_ID && (token->value)[0] != '$') {
+    if (token != NULL && token->token_type == TOK_ID && (token->value)[0] != '$') {
         if(is_fdef) {
             scope = token->value;
              if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
@@ -341,6 +341,41 @@ bool term_type(token_storage_t *token_storage) {
     return 0;
 }
 
+bool term_idfun_call(token_storage_t *token_storage) {
+    token_t *token = get_token_keep(token_storage);
+    if (token == NULL) {
+        return false;
+    }
+    if (token->token_type == TOK_ID && token->value[0] != '$') {
+        /*
+        if (search(id_node, token->value) != NULL) {
+            get_token(token_storage);
+            return true;
+        }
+        error = 3;
+        return false;
+        */
+        get_token(token_storage);
+        return true;
+    }
+    return false;
+    /*
+    token_t *token = get_token_keep(token_storage);
+    if (token == NULL) {
+        return false;
+    }
+
+    if (token->token_type == TOK_ID && token->value[0] != '$') {
+        if (search(id_node, token->value) != NULL) {
+            get_token(token_storage);
+            return true;
+        }
+        error = 3;
+        return false;
+    }
+    return false;
+    */
+}
 
 bool rule_st(token_storage_t *token_storage) {
     token_t *token = get_token_keep(token_storage);
@@ -369,7 +404,8 @@ bool rule_st(token_storage_t *token_storage) {
         return 0;
     }
 
-    if (term_idfun(token_storage, 0)) {
+    if (term_idfun_call(token_storage)) {
+
         if(term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
             return 1;
         }

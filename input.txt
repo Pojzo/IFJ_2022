@@ -1,3 +1,15 @@
 <?php
 declare(strict_types=1);
+<<<<<<< Updated upstream
 $x = 1.7976931348623157E+308;
+=======
+
+function bratislava() : void  {
+
+}
+
+$d = "hovno";
+$x = $d;
+
+bratislava($d);
+>>>>>>> Stashed changes
