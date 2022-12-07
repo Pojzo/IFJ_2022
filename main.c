@@ -25,37 +25,6 @@ char *get_buffer();
 int run(char *buffer);
 void test_prolog();
 
-// comment the code below
-char *get_buffer() {
-    FILE *fp;
-    fp = fopen("input.txt", "r");
-    if (ferror(fp)) {
-        printf("Couldn't open input file\n");
-        fclose(fp);
-        return NULL;
-    }
-    char *buffer = malloc(MAX_BUFFER_LEN);
-    char c;
-    int i = 0;
-    while ((c = fgetc(fp)) != EOF) {
-        buffer[i++] = c;
-    }
-    buffer[i] = ' ';
-    buffer[i+1] = '\0';
-    // printf("%s\n", buffer);
-    // printf("%d\n", (int)strlen(buffer));
-    fclose(fp);
-
-    return buffer;
-}
-
-// write a function to load standard input into a buffer and return it 
-// (you can use malloc to allocate memory for the buffer)
-// comment the code below
-
-// using the function fgets, read the standard input into a buffer and return it
-// account for new lines, get the whole input
-
 char *get_stdin() {
     char *buffer = malloc(MAX_BUFFER_LEN);
     int c;
@@ -74,16 +43,12 @@ const char *epilog = "?>";
 
 int main() {
 
-    //char *source = get_buffer();
     char *source = get_stdin();
     printf("%s", source);
     int error = run(source);
     free(source);
-    /*
-       printf("Running prolog tests\n-------------------\n");
-       test_prolog();
-       */
     printf("Returnujem tento error %d\n", error);
+    exit(error);
     return error;
 }
 
