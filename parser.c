@@ -62,6 +62,7 @@ int parser_start(char *buffer) {
         printf("\x1b[32m" "\nLexical analysis was successful\n" "\x1b[0m");
     }
     add_builtin_functions();
+    printf("Pocet dobrych %d\n", search(id_node, "ord")->num_arguments);
     /*insert_function_id(&id_node, "floatval");
     insert_function_id(&id_node, "intval");
     insert_function_id(&id_node, "strval");
@@ -407,8 +408,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_idfun_call(token_storage)) {
-
-        if(term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
+        if(term_open_bracket(token_storage) && rule_funccallarg(token_storage, token->value)) {
             return 1;
         }
         else {
@@ -456,21 +456,31 @@ bool rule_else (token_storage_t *token_storage) {
     return 0;
 }
 
-bool rule_funccallarg (token_storage_t *token_storage) {
+bool rule_funccallarg (token_storage_t *token_storage, char *function_name) {
+    id_node_t *function = search(id_node, function_name);
+    int anticipated_args = function->num_arguments;
     if (term_close_bracket(token_storage) && term_semicolon(token_storage)) {
+        if (anticipated_args != 0) {
+            error = 4;
+            return 0;
+        }
         return 1;
     }
-    if (rule_expr(token_storage) && rule_next(token_storage) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage) && rule_next(token_storage, anticipated_args, 1, function_name) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
 }
 
-bool rule_next (token_storage_t *token_storage) {
+bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_args, char *function_name) {
     if (term_close_bracket(token_storage)) {
+        if(curr_args != anticipated_args && strcmp(function_name, "write") != 0) {
+            error = 4;
+            return 0;
+        }
         return 1;
     }
-    if(term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage)) {
+    if (term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage, anticipated_args, curr_args + 1, function_name)) {
         return 1;
     }
     return 0;
@@ -566,14 +576,38 @@ void add_builtin_functions() {
     insert_function_id(&id_node, "write");
 
     insert_function_id(&id_node, "floatval");
+    fun_add_arg(id_node, "floatval", TYPE_INT);
+    fun_add_return_type(id_node, "floatval", TYPE_FLOAT);
+
+
     insert_function_id(&id_node, "intval");
+    fun_add_arg(id_node, "intval", TYPE_STRING);
+    fun_add_return_type(id_node, "intval", TYPE_INT);
+
     insert_function_id(&id_node, "strval");
+    fun_add_arg(id_node, "strval", TYPE_INT);
+    fun_add_return_type(id_node, "strval", TYPE_STRING);
 
     insert_function_id(&id_node, "strlen");
+    fun_add_arg(id_node, "strlen", TYPE_STRING);
+    fun_add_return_type(id_node, "strlen", TYPE_INT);
+
     insert_function_id(&id_node, "substring");
+    fun_add_arg(id_node, "substring", TYPE_STRING);
+    fun_add_arg(id_node, "substring", TYPE_INT);
+    fun_add_arg(id_node, "substring", TYPE_INT);
+
+    fun_add_return_type(id_node, "substring", TYPE_OPT_STRING);
 
     insert_function_id(&id_node, "ord");
+    fun_add_arg(id_node, "ord", TYPE_STRING);
+    printf("Pocet dobrych %d\n", search(id_node, "ord")->num_arguments);
+    fun_add_return_type(id_node, "ord", TYPE_INT);
+
     insert_function_id(&id_node, "chr");
+    fun_add_arg(id_node, "chr", TYPE_INT);
+    fun_add_return_type(id_node, "chr", TYPE_STRING);
+
     return;
 }
 

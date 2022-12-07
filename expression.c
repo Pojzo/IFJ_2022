@@ -37,7 +37,9 @@ const int prec_table[N][N] =
 
 
 
+
 bool moved_input;
+extern bool rule_st;
 
 bool rule_expr(token_storage_t *token_storage) {
     printf("tu soms a dostal more gadzo\n");
