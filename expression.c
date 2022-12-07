@@ -32,7 +32,7 @@ const int prec_table[N][N] =
 	{ R_A , R_A , R_A , R_A , R_A , EQ_A  , R_A ,  ERR  }, /// (
 	{ L_A , L_A , L_A , L_A ,  ERR  , L_A ,  ERR  , L_A }, /// )
 	{ L_A , L_A , L_A , L_A ,  ERR  , L_A ,  ERR  , L_A }, /// i (id, int, double, string)
-	{ R_A , R_A , R_A ,  ERR  , R_A ,  ERR  , R_A , END }  /// $
+	{ R_A , R_A , R_A ,  R_A  , R_A ,  ERR  , R_A , END }  /// $
 };
 
 
@@ -40,6 +40,7 @@ const int prec_table[N][N] =
 bool moved_input;
 
 bool rule_expr(token_storage_t *token_storage) {
+    printf("tu soms a dostal more gadzo\n");
     moved_input = true;
     int left_brackets = 0;
     list_t *list = list_init();
@@ -63,7 +64,7 @@ bool rule_expr(token_storage_t *token_storage) {
 
         if (token->token_type == TOK_ID) {
             if (!check_if_declared(id_node, token->value, scope)) {
-                printf("toto sa malo stat\n");
+                // printf("toto sa malo stat\n");
                 error = 5;
                 return false;
             }
@@ -85,7 +86,7 @@ bool rule_expr(token_storage_t *token_storage) {
     }
 end:
     list_free(list);
-    printf("Pocet zatvoriek na konci %d\n", left_brackets);
+    // printf("Pocet zatvoriek na konci %d\n", left_brackets);
     return inner_error;
 }
 
@@ -166,7 +167,7 @@ bool left_assoc(list_t **list) {
 
 bool rule_check(list_t **list) {
     int num_till_stop = symbols_till_stop(*list);
-    printf("Viktor stromcek: %d\n", num_till_stop);
+    // printf("Viktor stromcek: %d\n", num_till_stop);
     if (num_till_stop == 1) {
         // pouzijeme i -> E
         list_pop_first(list);
@@ -187,14 +188,14 @@ bool rule_check(list_t **list) {
 
 bool check_end(token_t *token, int *left_brackets) {
     if (strcmp(token->value, "(") == 0) {
-        printf("Pridavam lavu zatvorku\n");
+        // printf("Pridavam lavu zatvorku\n");
         (*left_brackets)++;
         // this is good
         return 0;
     }
     if (strcmp(token->value, ")") == 0) {
         (*left_brackets)--;
-        printf("Uberam pravu zatvorku\n");
+        // printf("Uberam pravu zatvorku\n");
         if (*left_brackets < 0) {
             // this is bad, meaning we're reached the end of expr
             return 1;
