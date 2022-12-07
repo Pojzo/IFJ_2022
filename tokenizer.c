@@ -514,11 +514,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     token_value_len++;
                     i++;
                 }
-                else if(current_char == 'v'){
-                    current_state = STATE_QUESTION_VOID;
-                    token_value_len++;
-                    i++;
-                }
                 else {
                     current_state = STATE_ERROR;
                 }
