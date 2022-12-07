@@ -15,7 +15,7 @@
 #include "parser.h"
 #include "tokenizer.h"
 
-const int MAX_BUFFER_LEN = 10000;
+const int MAX_BUFFER_LEN = 20000;
 
 const int DEBUG_PARSER = 1;
 const int DEBUG_LEXER = 0;
