@@ -22,5 +22,6 @@ bool rule_check(list_t **list);
 bool check_end(token_t* token, int* left_brackets);
 symbol_enum convert_token_to_symbol(token_t *token, bool* valid);
 int convert_symbol_to_int(symbol_enum symbol);
+bool contains_dot(char *);
 
 #endif

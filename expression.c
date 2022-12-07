@@ -46,7 +46,7 @@ const int prec_table[N][N] =
 bool moved_input;
 extern bool rule_st;
 
-bool rule_expr(token_storage_t *token_storage, datatype_t *datatype) {
+bool rule_expr(token_storage_t *token_storage) {
     printf("tu soms a dostal more gadzo\n");
     symbol_enum type = NONTERM;
     moved_input = true;
@@ -69,11 +69,26 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *datatype) {
         bool valid = 1;
         symbol_enum top = list_get_first_term(list);
         symbol_enum input = convert_token_to_symbol(token, &valid);
+
         if (input == INT || input == FLOAT || input == STRING) {
             if (type == NONTERM) {
-                if () // TODO
+                type = input;
+            }
+            else {
+                if (type == INT || type == FLOAT) {
+                    // type = 5, 5.5, input = "gazdik"
+                    if (input == STRING) {
+                        error = 7;
+                        goto end;
+                    }
+                }
+                if (type == STRING && input != STRING) {
+                    error = 7;
+                    goto end;
+                }
             }
         }
+        type = input;
 
         if (token->token_type == TOK_ID && token->value[0] == '$') {
             if (!check_if_declared(id_node, token->value, scope)) {
@@ -329,7 +344,14 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
     return NEQ;
 }
 
-datatype_t token_to_datatyep
+bool contains_dot(char *str) {
+    for (int i = 0; str[i]; i++) {
+        if (str[i] == '.') {
+            return true;
+        }
+    }
+    return false;
+}
 
 /*
 bool rule_funccallarg (token_storage_t *token_storage, char *function_name) {
