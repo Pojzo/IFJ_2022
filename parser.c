@@ -385,9 +385,11 @@ bool term_idfun_call(token_storage_t *token_storage) {
 }
 
 bool rule_st(token_storage_t *token_storage) {
+    // default datatype
+    datatype_t datatype = TYPE_VOID;
     token_t *token = get_token_keep(token_storage);
     if (term_while(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage) && 
+        if (term_open_bracket(token_storage) && rule_expr(token_storage, &datatype) && 
                term_close_bracket(token_storage) && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             return 1;
         }
@@ -395,7 +397,7 @@ bool rule_st(token_storage_t *token_storage) {
     }
     
     if (term_if(token_storage)) {
-        if (term_open_bracket(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)
+        if (term_open_bracket(token_storage) && rule_expr(token_storage, &datatype) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
             printf("%s---------\n", token->value);
             token = get_token_keep(token_storage);
@@ -425,12 +427,10 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
-        
-        insert_id(&id_node, token->value, TYPE_VOID, scope);
-
         //print_tree(id_node);
-        if( term_equals(token_storage) && rule_expr(token_storage) && 
+        if( term_equals(token_storage) && rule_expr(token_storage, &datatype) && 
         term_semicolon(token_storage)) {
+            insert_id(&id_node, token->value, datatype, scope);
             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
             return 1;
         }
@@ -474,7 +474,8 @@ bool rule_funccallarg (token_storage_t *token_storage, char *function_name) {
         }
         return 1;
     }
-    if (rule_expr(token_storage) && rule_next(token_storage, anticipated_args, 1, function_name) && term_semicolon(token_storage)) {
+    datatype_t datatype = TYPE_VOID;
+    if (rule_expr(token_storage, &datatype) && rule_next(token_storage, anticipated_args, 1, function_name) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;
@@ -488,7 +489,8 @@ bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_a
         }
         return 1;
     }
-    if (term_comma(token_storage) && rule_expr(token_storage) && rule_next(token_storage, anticipated_args, curr_args + 1, function_name)) {
+    datatype_t datatype = TYPE_VOID;
+    if (term_comma(token_storage) && rule_expr(token_storage, &datatype) && rule_next(token_storage, anticipated_args, curr_args + 1, function_name)) {
         return 1;
     }
     return 0;
@@ -567,11 +569,12 @@ bool rule_function_body(token_storage_t* token_storage) {
 }
 
 bool rule_return_cond(token_storage_t* token_storage) {
+    datatype_t datatype = TYPE_VOID;
     if (term_semicolon(token_storage)) {
         return 1;
     }
             
-    if (rule_expr(token_storage) && term_semicolon(token_storage)) {
+    if (rule_expr(token_storage, &datatype) && term_semicolon(token_storage)) {
         return 1;
     }
     return 0;

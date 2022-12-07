@@ -11,8 +11,9 @@
 
 #include "tokenizer.h"
 #include "list.h"
+#include "symtable.h"
 
-bool rule_expr(token_storage_t *token_storage);
+bool rule_expr(token_storage_t *token_storage, datatype_t *datatype);
 bool rule_expr2(list_t** list, token_storage_t* token_storage);
 int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t* token_storage, bool input_ended);
 void eq_assoc(list_t **list, symbol_enum input);

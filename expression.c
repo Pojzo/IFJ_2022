@@ -6,7 +6,8 @@
  * xjokay00 - David Jokay
  * xkovac66 - Peter Kováč
  * xbuchm02 - Marek Buch
- */#include <stdio.h>
+*/
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -46,7 +47,20 @@ const int prec_table[N][N] =
 bool moved_input;
 extern bool rule_st;
 
-bool rule_expr(token_storage_t *token_storage) {
+bool rule_expr(token_storage_t *token_storage, datatype_t *datatype) {
+
+    token_t *pot_null = get_token_keep(token_storage);
+    if (strcmp(pot_null->value, "null") == 0) {
+        get_token(token_storage);
+        token_t *next_token = get_token_keep(token_storage);
+        if (strcmp(next_token->value, ")") != 0 && strcmp(next_token->value, ",") != 0 && strcmp(next_token->value, ";") != 0) {
+            error = 7;
+            return 0;
+        }
+        return 1;
+    }
+
+    (void) datatype;
     printf("tu soms a dostal more gadzo\n");
     symbol_enum type = NONTERM;
     moved_input = true;
