@@ -47,9 +47,15 @@ const int prec_table[N][N] =
 bool moved_input;
 extern bool rule_st;
 
-bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype) {
-
+bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype, bool can_empty) {
     token_t *pot_null = get_token_keep(token_storage);
+    if (strcmp(pot_null->value, ")") == 0 || strcmp(pot_null->value, ";") == 0 || strcmp(pot_null->value, ",") == 0) {
+        if (!can_empty) {
+            error = 2;
+            return 0;
+        }
+    }
+
     if (strcmp(pot_null->value, "null") == 0) {
         get_token(token_storage);
         token_t *next_token = get_token_keep(token_storage);
@@ -57,10 +63,10 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype) {
             error = 7;
             return 0;
         }
+        *return_datatype = TYPE_VOID;
         return 1;
     }
 
-    (void) return_datatype;
     bool is_string = 0;
     symbol_enum type = NONTERM;
     moved_input = true;
@@ -73,6 +79,7 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype) {
         if (moved_input) {
             int end = check_end(token, &left_brackets);
             if (end == 1) {
+                print_list(list);
                 // end of input
                 // second part of expression, $ is always on input
                 inner_error = rule_expr2(&list, token_storage, is_string);
@@ -123,7 +130,6 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype) {
         else {
             input = convert_token_to_symbol(token, &valid);
         }
-
 
         if (input == INT || input == FLOAT || input == STRING) {
             if (type == NONTERM) {
@@ -401,6 +407,7 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
             return FLOAT;
         }
         else {
+            printf("tu som sa mal dostat\n");
             return INT;
         }
     }
@@ -473,7 +480,7 @@ bool rule_funccallarg_alt(token_storage_t *token_storage, char *function_name) {
         return 1;
     }
     datatype_t datatype;
-    if (rule_expr(token_storage, &datatype) && rule_next_expr_alt(token_storage, anticipated_args, 1, function_name)) {
+    if (rule_expr(token_storage, &datatype, 1) && rule_next_expr_alt(token_storage, anticipated_args, 1, function_name)) {
         return 1;
     }
     return 0;
@@ -488,7 +495,7 @@ bool rule_next_expr_alt(token_storage_t *token_storage, int anticipated_args, in
         return 1;
     }
     datatype_t datatype = TYPE_VOID;
-    if (term_comma_alt(token_storage) && rule_expr(token_storage, &datatype) && rule_next_expr_alt(token_storage, anticipated_args, curr_args + 1, function_name)) {
+    if (term_comma_alt(token_storage) && rule_expr(token_storage, &datatype, 0) && rule_next_expr_alt(token_storage, anticipated_args, curr_args + 1, function_name)) {
         return 1;
     }
     return 0;

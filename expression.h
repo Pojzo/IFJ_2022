@@ -13,7 +13,7 @@
 #include "list.h"
 #include "symtable.h"
 
-bool rule_expr(token_storage_t *token_storage, datatype_t *datatype);
+bool rule_expr(token_storage_t *token_storage, datatype_t *datatype, bool can_null);
 bool rule_expr2(list_t** list, token_storage_t* token_storage, bool is_string);
 int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t* token_storage, bool input_ended, bool is_string);
 datatype_t convert_symbol_to_datatype(symbol_enum symbol);
