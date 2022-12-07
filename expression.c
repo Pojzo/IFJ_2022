@@ -15,10 +15,11 @@ typedef enum {
     END   // end of input
 } assoc_t;
 
+int error = 0;
+
 #define N 8
 
 extern id_node_t *id_node;
-extern int error;
 extern char *scope;
 
 const int prec_table[N][N] =
@@ -42,7 +43,7 @@ bool rule_expr(token_storage_t *token_storage) {
     moved_input = true;
     int left_brackets = 0;
     list_t *list = list_init();
-    int error = false;
+    int inner_error = false;
     while(true) {
         // get current token
         token_t *token = get_token_keep(token_storage);
@@ -51,7 +52,7 @@ bool rule_expr(token_storage_t *token_storage) {
             if (end == 1) {
                 // end of input
                 // second part of expression, $ is always on input
-                error = rule_expr2(&list, token_storage);
+                inner_error = rule_expr2(&list, token_storage);
                 goto end;
             }
         }
@@ -62,6 +63,7 @@ bool rule_expr(token_storage_t *token_storage) {
 
         if (token->token_type == TOK_ID) {
             if (!check_if_declared(id_node, token->value, scope)) {
+                printf("toto sa malo stat\n");
                 error = 5;
                 return false;
             }
@@ -72,19 +74,19 @@ bool rule_expr(token_storage_t *token_storage) {
         // we need to check if input was valid
         if (valid == 0) {
             // syntax error
-            error = false;
+            inner_error = false;
             goto end;
         }
         if (!main_alg(&list, top, input, token_storage, 0)) {
             // this mean that there has been an error in main_alg
-            error = false;
+            inner_error = false;
             goto end;
         }
     }
 end:
     list_free(list);
     printf("Pocet zatvoriek na konci %d\n", left_brackets);
-    return error;
+    return inner_error;
 }
 
 // second part of expression when input end

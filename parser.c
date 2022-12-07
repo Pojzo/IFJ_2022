@@ -10,7 +10,6 @@
 #include "symtable.h"
 
 int token_index = 0;
-int error = 0;
 extern const char *prolog;
 extern const int DEBUG_PARSER;
 extern const int DEBUG_LEXER;
@@ -22,6 +21,8 @@ extern const int string_oper_len;
 char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
 char *return_type = "";
 char **args = NULL;
+
+extern int error;
 
 id_node_t *id_node = NULL;
 
@@ -70,6 +71,7 @@ int parser_start(char *buffer) {
     if (!rule_program(token_storage)) {
         printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
         if (error == 0) {
+            printf("rovna sa koko 0 %d\n", error);
             error = 2;
         }
         goto end;
@@ -84,10 +86,9 @@ int parser_start(char *buffer) {
     if (DEBUG_PARSER) print_tree(id_node);
     token_storage_free(token_storage);
     free_tree(id_node);
+    printf("Returning this error: %d\n", error);
     return error;
 }
-
-
 
 // check if buffer starts with prolog
 bool check_prolog(char *buffer) {
@@ -368,7 +369,6 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_idfun(token_storage, 0)) {
-        
         if(term_open_bracket(token_storage) && rule_funccallarg(token_storage)) {
             return 1;
         }

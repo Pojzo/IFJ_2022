@@ -1,5 +1,3 @@
 <?php
 declare(strict_types=1);
-function koko(int $pojzo): int {
-    $x = $pojzo;
-}
+$x = $y + 5;
