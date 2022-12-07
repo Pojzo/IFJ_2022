@@ -594,26 +594,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     return 1;
                 }
                 break;
-            case STATE_QUESTION_VOID:
-                if(current_char == 'o'){
-                    i++;
-                    token_value_len++;
-                    current_char = source[i];
-                    if(current_char == 'i'){
-                        i++;
-                        token_value_len++;
-                        current_char = source[i];
-                        if(current_char == 'd'){
-                            token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
-                            i++;
-                            current_state = STATE_START;
-                        }
-                    }
-                }
-                else{
-                    return 1;
-                }
-                break;
 
             case STATE_EPILOG_2:
             // ?>..
