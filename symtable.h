@@ -49,5 +49,6 @@ int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype);
 int fun_add_return_type(id_node_t* node, char* scope, datatype_t datatype);
 datatype_t convert_char_to_datatype(char *type);
 char *convert_back(datatype_t type);
+int insert_param_id(id_node_t **node, char *name, datatype_t datatype, char *scope);
 
 #endif

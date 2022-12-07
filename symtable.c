@@ -15,6 +15,7 @@
 #include "symtable.h"
 // TODO errory su nekonzistentne, to este musime dohodnut ako ich dame
 
+extern int error;
 // inserting function
 int insert_function_id(id_node_t **node, char *name)
 {
@@ -96,9 +97,54 @@ int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
     return error;
 }
 
+
+//insert function parameters
+int insert_param_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
+{
+
+    if (*(node) == NULL)
+    {
+        *node = malloc(sizeof(struct id_node));
+        if (*node == NULL)
+        {
+            return 0;
+        }
+        printf("inserting param \n");
+        (*node)->name = name;
+        (*node)->left = NULL;
+        (*node)->right = NULL;
+        (*node)->datatype = datatype;
+        (*node)->scope = scope;
+        (*node)->arguments = NULL;
+        (*node)->num_arguments = 0;
+        return error;
+    }
+    // if bigger, go left
+    if (is_bigger((*node)->name, name))
+    {
+        insert_param_id(&(*node)->left, name, datatype, scope);
+    }
+        // if smaller, go right
+    else if (is_bigger(name, (*node)->name))
+    {
+        insert_param_id(&(*node)->right, name, datatype, scope);
+    }
+    else if (strcmp((*node)->scope, scope) == 0)
+    {
+        error = 4;
+        return error;
+    }
+    else
+    {
+        printf("PREPADLI SME SEM BRASKO POMOC\n");
+        insert_id(&(*node)->right, name, datatype, scope);
+    }
+    return error;
+}
 // comparing strings alphabetically
 bool is_bigger(char *a, char *b)
 {
+
     int i = 0;
     while (a[i] != '\0' && b[i] != '\0')
     {
