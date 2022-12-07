@@ -412,10 +412,8 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                     token_value_len++;
                     current_state = STATE_LIT_NUM_FLOAT_E_3;
-                    printf("som tu \n");
                 }
                 else {
-                    printf("spadneme sme\n");
                     current_state = STATE_ERROR;
                 }
                 break;
@@ -429,6 +427,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_LIT_NUM_FLOAT_E_3;
                 }
                 else {
+                    token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
                 }
                 break;
