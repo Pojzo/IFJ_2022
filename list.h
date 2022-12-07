@@ -31,6 +31,7 @@ typedef enum {
     CLOSEDBR, // )
     STOP,     // '<' 17
     NONTERM,  // E
+    VOID
 } symbol_enum;
 
 /*

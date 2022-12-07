@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-function f(int $b, int $b) : void {
-$id = 5;
-$id = "davidko";
+function xd(string $kokot) : int {
+    return 5;
 }
-  return;
+
+function f(string $a, string $b) : void {
+    $d = xd("pica");
 }
