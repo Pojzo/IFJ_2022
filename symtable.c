@@ -49,15 +49,12 @@ int insert_function_id(id_node_t **node, char *name)
 
 // inserting ID
 // function will be called only in parser
-int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
-{
+int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope) {
     // if inserting root
     int error = 0;
-    if (*(node) == NULL)
-    {
+    if (*(node) == NULL){
         *node = malloc(sizeof(struct id_node));
-        if (*node == NULL)
-        {
+        if (*node == NULL){
             return 0;
         }
         (*node)->name = name;
@@ -72,20 +69,16 @@ int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope)
         return error;
     }
     // if bigger, go left
-    if (is_bigger((*node)->name, name))
-    {
+    if (is_bigger((*node)->name, name)){
         insert_id(&(*node)->left, name, datatype, scope);
     }
     // if smaller, go right
-    else if (is_bigger(name, (*node)->name))
-    {
+    else if (is_bigger(name, (*node)->name)){
         insert_id(&(*node)->right, name, datatype, scope);
     }
     //
-    else if (strcmp((*node)->scope, scope) == 0)
-    {
-        if ((*node)->datatype != datatype)
-        {
+    else if (strcmp((*node)->scope, scope) == 0){
+        if ((*node)->datatype != datatype){
             (*node)->datatype = datatype;
         }
     }
@@ -189,8 +182,42 @@ int check_if_declared(id_node_t *node, char *name, char *scope) {
 }
 
 // explicitne pre funkcie funguje
-id_node_t *search(id_node_t *node, char *name)
-{
+datatype_t search_return_type(id_node_t *node, char *name){
+    if (node == NULL) {
+        return -1;
+    }
+    if (is_bigger(node->name, name)) {
+        return search_return_type(node->left, name);
+    }
+    else if (is_bigger(name, node->name)){
+        return search_return_type(node->right, name);
+    }
+    else {
+        return node->return_type;
+    }
+}
+
+datatype_t search_datatype(id_node_t *node, char *name, char*scope){
+    if (node == NULL) {
+        return -1;
+    }
+    if (is_bigger(node->name, name)) {
+        return search_datatype(node->left, name, scope);
+    }
+    else if (is_bigger(name, node->name)) {
+        return search_datatype(node->right, name, scope);
+    }
+    else {
+        if(strcmp(node->scope, scope) == 0){
+            return node->datatype;
+        }
+        else{
+            return search_datatype(node->right, name, scope);
+        }
+    }
+}
+
+id_node_t *search(id_node_t *node, char *name){
     if (node == NULL) {
         return NULL;
     }
@@ -205,10 +232,9 @@ id_node_t *search(id_node_t *node, char *name)
     }
 }
 
-int fun_add_arg(id_node_t *node, char *scope, datatype_t datatype)
-{
-    if (node == NULL)
-    {
+
+int fun_add_arg(id_node_t *node, char *scope, datatype_t datatype){
+    if (node == NULL){
         return 0;
     }
     // print the datatype as string
@@ -219,8 +245,7 @@ int fun_add_arg(id_node_t *node, char *scope, datatype_t datatype)
     return 0;
 }
 
-int fun_add_return_type(id_node_t *node, char *scope, datatype_t datatype)
-{
+int fun_add_return_type(id_node_t *node, char *scope, datatype_t datatype){
     // print the datatype as string
     id_node_t *current = search(node, scope);
     current->return_type = datatype;
@@ -228,10 +253,8 @@ int fun_add_return_type(id_node_t *node, char *scope, datatype_t datatype)
 }
 
 // write a function to recursively free the tree
-void free_tree(id_node_t *node)
-{
-    if (node == NULL)
-    {
+void free_tree(id_node_t *node){
+    if (node == NULL){
         return;
     }
     free_tree(node->left);
@@ -241,55 +264,43 @@ void free_tree(id_node_t *node)
 }
 
 // function that prints all nodes of tree
-void print_tree(id_node_t *node)
-{
-    if (node == NULL)
-    {
+void print_tree(id_node_t *node){
+    if (node == NULL){
         return;
     }
     print_tree(node->left);
     printf("--------------------------------------\n");
     printf("NODE:\n");
-    if (node->name[0] == '$')
-    {
+    if (node->name[0] == '$'){
         printf("name: %s\nscope: %s\ndatatype: %s\n", node->name, node->scope, convert_back(node->datatype));
     }
-    else
-    {
+    else{
         printf("name: %s\nreturntype: %s\n", node->name, convert_back(node->return_type));
         // print all arguments of function along with the function's name
-        for (int i = 0; i < node->num_arguments; i++)
-        {
+        for (int i = 0; i < node->num_arguments; i++){
             printf("argument %d: %s\n", i, convert_back(node->arguments[i]));
         }
     }
     print_tree(node->right);
 }
 
-datatype_t convert_char_to_datatype(char *type)
-{
-    if (strcmp(type, "int") == 0)
-    {
+datatype_t convert_char_to_datatype(char *type){
+    if (strcmp(type, "int") == 0){
         return TYPE_INT;
     }
-    if (strcmp(type, "float") == 0)
-    {
+    if (strcmp(type, "float") == 0){
         return TYPE_FLOAT;
     }
-    if (strcmp(type, "string") == 0)
-    {
+    if (strcmp(type, "string") == 0){
         return TYPE_STRING;
     }
-    if (strcmp(type, "?int") == 0)
-    {
+    if (strcmp(type, "?int") == 0){
         return TYPE_OPT_INT;
     }
-    if (strcmp(type, "?float") == 0)
-    {
+    if (strcmp(type, "?float") == 0){
         return TYPE_OPT_FLOAT;
     }
-    if (strcmp(type, "?string") == 0)
-    {
+    if (strcmp(type, "?string") == 0){
         return TYPE_OPT_STRING;
     }
     return TYPE_VOID;

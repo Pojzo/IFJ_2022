@@ -43,6 +43,8 @@ int insert_id(id_node_t** node, char* name, datatype_t datatype, char* scope);
 bool is_bigger(char* a, char* b);
 int check_if_declared(id_node_t* node, char* name, char* scope);
 id_node_t* search(id_node_t* node, char* name);
+datatype_t search_datatype(id_node_t *node, char *name, char*scope);
+datatype_t search_return_type(id_node_t *node, char *name);
 void free_tree(id_node_t* node);
 void print_tree(id_node_t* node);
 int fun_add_arg(id_node_t* node, char* scope, datatype_t datatype);
