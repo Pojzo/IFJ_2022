@@ -13,7 +13,6 @@
 #include "tokenizer.h"
 #include "utils.h"
 #include "symtable.h"
-// TODO errory su nekonzistentne, to este musime dohodnut ako ich dame
 
 extern int error;
 // inserting function
@@ -43,7 +42,6 @@ int insert_function_id(id_node_t **node, char *name)
     {
         return insert_function_id(&(*node)->right, name);
     }
-    printf("Nejaka funkcia ma rovnake meno\n");
     return 3;
 }
 
@@ -64,8 +62,6 @@ int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope) {
         (*node)->scope = scope;
         (*node)->arguments = NULL;
         (*node)->num_arguments = 0;
-        // print_tree(*node);
-        // pozor pozor, psekulacia
         return error;
     }
     // if bigger, go left
@@ -84,7 +80,6 @@ int insert_id(id_node_t **node, char *name, datatype_t datatype, char *scope) {
     }
     else
     {
-        printf("PREPADLI SME SEM BRASKO POMOC\n");
         insert_id(&(*node)->right, name, datatype, scope);
     }
     return error;
@@ -102,7 +97,6 @@ int insert_param_id(id_node_t **node, char *name, datatype_t datatype, char *sco
         {
             return 0;
         }
-        printf("inserting param \n");
         (*node)->name = name;
         (*node)->left = NULL;
         (*node)->right = NULL;
@@ -129,7 +123,6 @@ int insert_param_id(id_node_t **node, char *name, datatype_t datatype, char *sco
     }
     else
     {
-        printf("PREPADLI SME SEM BRASKO POMOC\n");
         insert_id(&(*node)->right, name, datatype, scope);
     }
     return error;
@@ -166,8 +159,6 @@ int check_if_declared(id_node_t *node, char *name, char *scope) {
         return 0;
     }
     if (strcmp(node->name, name) == 0) {
-        printf("%s\n", node->name);
-        printf("node_scope je takyto %s, a hento je taketo %s, node name %s\n", node->scope, scope, node->name);
         if (strcmp(node->scope, scope) == 0) {
             return 1;
         }
@@ -237,7 +228,6 @@ int fun_add_arg(id_node_t *node, char *scope, datatype_t datatype){
     if (node == NULL){
         return 0;
     }
-    // print the datatype as string
     id_node_t *current = search(node, scope);
     current->num_arguments++;
     current->arguments = realloc(current->arguments, current->num_arguments * sizeof(enum datatype));
@@ -246,7 +236,6 @@ int fun_add_arg(id_node_t *node, char *scope, datatype_t datatype){
 }
 
 int fun_add_return_type(id_node_t *node, char *scope, datatype_t datatype){
-    // print the datatype as string
     id_node_t *current = search(node, scope);
     current->return_type = datatype;
     return 0;
@@ -261,27 +250,6 @@ void free_tree(id_node_t *node){
     free_tree(node->right);
     free(node->arguments);
     free(node);
-}
-
-// function that prints all nodes of tree
-void print_tree(id_node_t *node){
-    if (node == NULL){
-        return;
-    }
-    print_tree(node->left);
-    printf("--------------------------------------\n");
-    printf("NODE:\n");
-    if (node->name[0] == '$'){
-        printf("name: %s\nscope: %s\ndatatype: %s\n", node->name, node->scope, convert_back(node->datatype));
-    }
-    else{
-        printf("name: %s\nreturntype: %s\n", node->name, convert_back(node->return_type));
-        // print all arguments of function along with the function's name
-        for (int i = 0; i < node->num_arguments; i++){
-            printf("argument %d: %s\n", i, convert_back(node->arguments[i]));
-        }
-    }
-    print_tree(node->right);
 }
 
 datatype_t convert_char_to_datatype(char *type){

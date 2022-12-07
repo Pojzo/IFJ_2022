@@ -26,7 +26,7 @@ extern const char* string_operators[];
 extern const int string_oper_len;
 
 //arguments for inserting into symtable
-char *scope = "global"; //viem ze take tu neni, ale defaultne som to nazval tak, ked premenna nie je vo funkcii
+char *scope = "global";
 char *return_type = "";
 char **args = NULL;
 
@@ -44,7 +44,6 @@ int parser_start(char *buffer) {
     token_storage_t *token_storage = token_storage_create();
     //int error = 0;
     if (!check_prolog(buffer)) {
-        printf("\x1b[31m" "Error in checking prolog" "\x1b[0m" "\n");
         error = 2;
         goto end;
     }
@@ -56,46 +55,31 @@ int parser_start(char *buffer) {
     if (DEBUG_LEXER) {
         token_t *token = NULL;
         while ((token = get_token(token_storage)) != NULL) {
-        token_print(token);
         }
     }
     token_index = 0;
     if (error) {
-        printf("[ERROR] An error has occured in lexical analysis %s\n", "\U0001F913");
         error = 1;
         goto end;
     }
 
     else {
-        printf("\x1b[32m" "\nLexical analysis was successful\n" "\x1b[0m");
     }
     add_builtin_functions();
-    printf("Pocet dobrych %d\n", search(id_node, "ord")->num_arguments);
-    /*insert_function_id(&id_node, "floatval");
-    insert_function_id(&id_node, "intval");
-    insert_function_id(&id_node, "strval");
-    insert_function_id(&id_node, "strlen");
-    insert_function_id(&id_node, "substring");*/
     // check if declare(strict_types=1) is present
     if (!rule_program(token_storage)) {
-        printf("\x1b[31m" "Error in rule_program" "\x1b[0m" "\n");
         if (error == 0) {
-            printf("rovna sa koko 0 %d\n", error);
             error = 2;
         }
         goto end;
     }
 
     else {
-        printf("\x1b[32m" "Syntax analysis was successful\n" "\x1b[0m");
     }
 
-    // printf("Number of tokens: %d\n", token_storage->num_tokens);
     end:
-    if (DEBUG_PARSER) print_tree(id_node);
     token_storage_free(token_storage);
     free_tree(id_node);
-    printf("Returning this error: %d\n", error);
     return error;
 }
 
@@ -130,44 +114,36 @@ int check_strict_types(token_storage_t *token_storage) {
     token_t *token = get_token(token_storage);
 
     if (token == NULL || token->token_type != TOK_ID || strcmp(token->value, "declare") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in first condition" "\x1b[0m" "\n");
-        printf("%d %d %d\n", token == NULL, token_index, token_storage->num_tokens);
         return 0;
     }
 
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, "(") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in second condition" "\x1b[0m" "\n");
         return 0;
     }
 
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_ID || strcmp(token->value, "strict_types") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in third condition" "\x1b[0m" "\n");
         return 0;
     }
 
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_OPERATOR || strcmp(token->value, "=") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in fourth condition" "\x1b[0m" "\n");
         return 0;
     }
     
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_LIT || strcmp(token->value, "1") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in fifth condition" "\x1b[0m" "\n");
         return 0;
     }
 
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, ")") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in sixth condition" "\x1b[0m" "\n");
         return 0;
     }
 
     token = get_token(token_storage);
     if (token == NULL || token->token_type != TOK_SEPARATOR || strcmp(token->value, ";") != 0) {
-        if (DEBUG_PARSER) printf("\x1b[31m" "Error in seventh condition" "\x1b[0m" "\n");
         return 0;
     }
     return 1;
@@ -329,7 +305,6 @@ bool term_idfun(token_storage_t *token_storage, bool is_fdef) {
     if (token != NULL && token->token_type == TOK_ID && (token->value)[0] != '$') {
         if(is_fdef) {
             scope = token->value;
-             if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
         }
         get_token(token_storage);
         return 1;
@@ -383,17 +358,14 @@ bool rule_st(token_storage_t *token_storage) {
     if (term_if(token_storage)) {
         if (term_open_bracket(token_storage) && rule_expr(token_storage, &datatype, 0) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
-            printf("%s---------\n", token->value);
             token = get_token_keep(token_storage);
             if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
                 get_token(token_storage);
                 if (rule_else(token_storage)) {
-                    printf("sme tu\n");
                     return 1;      
                 }
             } 
             else {
-                printf("nie sme tu\n");
                 return 1;
             }
          
@@ -411,11 +383,9 @@ bool rule_st(token_storage_t *token_storage) {
     }
 
     if (term_id(token_storage)) {
-        //print_tree(id_node);
         if( term_equals(token_storage) && rule_expr(token_storage, &datatype, 0) && 
         term_semicolon(token_storage)) {
             insert_id(&id_node, token->value, datatype, scope);
-            if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
             return 1;
         }
         else {
@@ -460,7 +430,6 @@ bool rule_funccallarg(token_storage_t *token_storage, char *function_name) {
     }
     datatype_t datatype = TYPE_VOID;
     if (rule_expr(token_storage, &datatype, 1)) {
-        printf("%d %d %d\n", function->num_arguments, function->num_arguments, function->num_arguments);
         if (function->num_arguments != 0 && function->arguments[0] == TYPE_OPT_INT && (datatype == TYPE_INT || datatype == TYPE_VOID)) {
             goto skip;
         }
@@ -495,7 +464,6 @@ bool rule_next (token_storage_t *token_storage, int anticipated_args, int curr_a
     datatype_t datatype = TYPE_VOID;
     if (term_comma(token_storage)) {
         if (rule_expr(token_storage, &datatype, 0)) {
-            printf("curr args: %d, pocet: %d\n", curr_args, function->num_arguments);
             if (function->num_arguments > curr_args && function->arguments[curr_args] == TYPE_OPT_INT && (datatype == TYPE_INT || datatype == TYPE_VOID)) {
                 goto skip;
             }
@@ -523,7 +491,6 @@ skip:
 bool rule_fdef (token_storage_t *token_storage) {
     if (term_function(token_storage)) {
         token_t *fun_name = get_token_keep(token_storage);
-        // toto znamena ze tato funkcia uz bola definovana
         if (insert_function_id(&id_node, fun_name->value) == 3) {
             error = 3;
             return 0;
@@ -538,7 +505,6 @@ bool rule_fdef (token_storage_t *token_storage) {
                     rule_function_body(token_storage)) {
                 //insert_function_id(id_node, scope, return_type, arguments);
                 scope = "global";
-                if (DEBUG_PARSER) printf("the scope is: %s\n", scope);
                 return 1;
             }
         }
@@ -672,7 +638,6 @@ void add_builtin_functions() {
 
     insert_function_id(&id_node, "ord");
     fun_add_arg(id_node, "ord", TYPE_STRING);
-    printf("Pocet dobrych %d\n", search(id_node, "ord")->num_arguments);
     fun_add_return_type(id_node, "ord", TYPE_INT);
 
     insert_function_id(&id_node, "chr");

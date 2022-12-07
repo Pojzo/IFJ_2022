@@ -142,7 +142,6 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype, bool
             }
             else {
                 if (type == INT || type == FLOAT) {
-                    // type = 5, 5.5, input = "gazdik"
                     if (input == STRING) {
                         error = 7;
                         goto end;
@@ -172,7 +171,6 @@ bool rule_expr(token_storage_t *token_storage, datatype_t *return_datatype, bool
 end:
     list_free(list);
     *return_datatype = convert_symbol_to_datatype(type);
-    // printf("Pocet zatvoriek na konci %d\n", left_brackets);
     return inner_error;
 }
 
@@ -189,7 +187,7 @@ datatype_t convert_symbol_to_datatype(symbol_enum symbol) {
     return TYPE_VOID;
 }
 
-// second part of expression when input end
+    // second part of expression when input end
 bool rule_expr2(list_t **list, token_storage_t* token_storage, bool is_string) {
     while (true) {
         symbol_enum top = list_get_first_term(*list);
@@ -208,9 +206,6 @@ bool rule_expr2(list_t **list, token_storage_t* token_storage, bool is_string) {
 }
 
 int main_alg(list_t **list, symbol_enum top, symbol_enum input, token_storage_t *token_storage, bool input_ended, bool is_string) {
-    // printf("Printujem list, ked input %s toto je top: %d, toto je input: %d  \n", input_ended == true ? "skoncil" : "neskoncil", top, input);
-    // print_list(*list);
-    // get precedence operator from table
     assoc_t prec_operator;
     if (input == VOID) {
         prec_operator = R_A;
@@ -272,7 +267,6 @@ bool left_assoc(list_t **list, bool is_string) {
 
 bool rule_check(list_t **list, bool is_string) {
     int num_till_stop = symbols_till_stop(*list);
-    // printf("Viktor stromcek: %d\n", num_till_stop);
     if (num_till_stop == 1) {
         // pouzijeme i -> E
         list_pop_first(list);
@@ -313,14 +307,12 @@ bool compatible_operands(symbol_enum operator, bool is_string) {
 
 bool check_end(token_t *token, int *left_brackets) {
     if (strcmp(token->value, "(") == 0) {
-        // printf("Pridavam lavu zatvorku\n");
         (*left_brackets)++;
         // this is good
         return 0;
     }
     if (strcmp(token->value, ")") == 0) {
         (*left_brackets)--;
-        // printf("Uberam pravu zatvorku\n");
         if (*left_brackets < 0) {
             // this is bad, meaning we're reached the end of expr
             return 1;
@@ -392,14 +384,8 @@ symbol_enum convert_token_to_symbol(token_t *token, bool *valid) {
             return FLOAT;
         }
         else {
-            printf("tu som sa mal dostat\n");
             return INT;
         }
-    }
-
-    if(token->token_type == TOK_ID) {
-        // TODO tunkcia 
-        return INT;
     }
 
     int length = strlen(token->value);

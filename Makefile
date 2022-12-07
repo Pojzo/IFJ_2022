@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-Werror -Wall -pedantic
 DEPS = expression.h list.h parser.h symtable.h tokenizer.h utils.h
 OBJ = main.o expression.o list.o parser.o symtable.o tokenizer.o utils.o
 

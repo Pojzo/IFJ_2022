@@ -63,7 +63,6 @@ void list_insert_first(list_t **list, symbol_enum symbol) {
     new->symbol = symbol;
 
     if (*list == NULL) {
-        printf("tu som sa ani nemal dostat more\n");
         *list = new;
         return;
     }
@@ -126,7 +125,6 @@ symbol_enum list_pop_first(list_t **list) {
 // checks whether the list only contains $E
 bool final_condition(list_t *list) {
     assert_not_null(list);
-    //printf("final_condition: %s, %s, %s\n", symbol_to_string[list->symbol], symbol_to_string[list->next->symbol], symbol_to_string[list->next->next->symbol]);
     return (list->symbol == NONTERM && list->next->symbol == DOLLAR);
 }
 // print list
@@ -134,10 +132,8 @@ void print_list(list_t *list) {
     assert_not_null(list);
     list_t *cur = list;
     while (cur != NULL) {
-        printf("%s ", symbol_to_string[cur->symbol]);
         cur = cur->next;
     }
-    printf("\n");
 }
 
 int symbols_till_stop(list_t* list) {
@@ -146,7 +142,6 @@ int symbols_till_stop(list_t* list) {
         num++;
         list = list->next;
         if (list == NULL) {
-            // nieco sa vazne pokazilo
             return -1;
         }
     }

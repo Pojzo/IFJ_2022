@@ -92,7 +92,6 @@ void token_print(token_t *token) {
     printf("Token->type: %s\nToken->value: %s - %d\n", TOK_STR[token->token_type], token->value, (int)strlen(token->value));
 }
 
-// ADDED
 // constructor for token_storage
 token_storage_t *token_storage_create() {
     // dynamically allocate space for token_storage structure
@@ -100,7 +99,6 @@ token_storage_t *token_storage_create() {
 
     // check if malloc failed
     if (token_storage == NULL) {
-        // TODO tuto dame nejaky error;
         return NULL;
     }
 
@@ -131,7 +129,6 @@ void token_storage_free(token_storage_t *token_storage) {
 void token_storage_add(token_storage_t *token_storage, tok_type token_type, char *start_ptr, int token_value_len) {
     token_t *token = token_create(token_type, start_ptr, token_value_len);
     if (token == NULL) {
-        // TODO tu dame nejaky error
     }
 
     // if there is no space in the array, reallocate it
@@ -162,7 +159,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_START;
                     break;
                 }
-                if (DEBUG_LEXER) debug_print_state("STATE_START", start_ptr, 1);
                 start_ptr = &source[i];
                 token_value_len = 1;
                 current_state = state_start(current_char);
@@ -170,18 +166,15 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
 
             case STATE_ID_START:
-                if (DEBUG_LEXER) debug_print_state("STATE_ID_START", start_ptr, token_value_len);
                 current_state = state_id_start(current_char);
                 token_value_len++;
                 i++;
                 break;
 
             case STATE_ID_MAIN:
-                if (DEBUG_LEXER) debug_print_state("STATE_ID_MAIN", start_ptr, token_value_len);
                 current_state = state_id_main(current_char);
                 // we read the whole identifier
                 if (current_state == STATE_ID) {
-                    // printf("Current char: %c %d\n", current_char, current_char == '\n');
                     token_storage_add(token_storage, TOK_ID, start_ptr, token_value_len);
                     current_state = STATE_START;
                     break;
@@ -191,7 +184,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_KEYWORD_MAIN:
-                if (DEBUG_LEXER) debug_print_state("STATE_KEYWORD_MAIN", start_ptr, token_value_len);
                 current_state = state_keyword_main(current_char);
                 if (current_state == STATE_KEYWORD) {
                     if (is_keyword(start_ptr, token_value_len)) {
@@ -208,14 +200,12 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_SEP:
-                if (DEBUG_LEXER) debug_print_state("STATE_SEP", start_ptr, token_value_len);
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_SEPARATOR, start_ptr, token_value_len);
                 break;
 
             // /...
             case STATE_COMMENT_START:
-                if (DEBUG_LEXER) debug_print_state("STATE_COMMENT_START", start_ptr, token_value_len);
                 if (current_char == '/') {
                     token_value_len++;
                     current_state = STATE_COMMENT_SINGLE; 
@@ -236,7 +226,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             //.....
             case STATE_COMMENT_SINGLE:
-                if (DEBUG_LEXER) debug_print_state("STATE_COMMENT_SINGLE", start_ptr, token_value_len);
                 // only end comment with new line
                 if (current_char == '\n') {
                     i++;
@@ -251,7 +240,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             // /*....
             case STATE_COMMENT_MULTI:
-                if (DEBUG_LEXER) debug_print_state("STATE_COMMENT_MULTI", start_ptr, token_value_len);
                 if(i == source_len -1){
                     current_state = STATE_ERROR;
                 }
@@ -269,7 +257,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             // /*... *
             case STATE_COMMENT_MULTI2:
-                if (DEBUG_LEXER) debug_print_state("STATE_COMMENT_MULTI2", start_ptr, token_value_len);
                 if (current_char == '/') {
                     start_ptr += token_value_len + 1;
                     current_state = STATE_START;
@@ -283,7 +270,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
             
             case STATE_OP:
-                if (DEBUG_LEXER) debug_print_state("STATE_OPERATOR", start_ptr, 1);
                 current_state = STATE_START;
                 token_storage_add(token_storage, TOK_OPERATOR, start_ptr, 1);
                 i++;
@@ -292,7 +278,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             case STATE_EQUAL_1:
                 // =...
                 // token_value_len = 2;
-                if (DEBUG_LEXER) debug_print_state("STATE_EQUAL_1", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_value_len++;
                     current_state = STATE_EQUAL_2;
@@ -305,7 +290,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
             case STATE_EQUAL_2:
             //  ==...
-                if (DEBUG_LEXER) debug_print_state("STATE_EQUAL_2", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
                     current_state = STATE_START;
@@ -318,7 +302,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             
             case STATE_NOT_1:
             // !...
-                if (DEBUG_LEXER) debug_print_state("STATE_NOT_1", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_value_len++;
                     current_state = STATE_NOT_2;
@@ -331,7 +314,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             case STATE_NOT_2:
             // !=...
-                if (DEBUG_LEXER) debug_print_state("STATE_NOT_2", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
                     current_state = STATE_START;
@@ -344,7 +326,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             
             case STATE_GREATER_EQUAL:
             // >...
-                if (DEBUG_LEXER) debug_print_state("STATE_GREATER_EQUAL", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
                     current_state = STATE_START;
@@ -359,7 +340,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             
             case STATE_SMALLER_EQUAL:
             // <...
-                if (DEBUG_LEXER) debug_print_state("STATE_SMALLER_EQUAL", start_ptr, token_value_len);
                 if (current_char == '=') {
                     token_storage_add(token_storage, TOK_OPERATOR, start_ptr, token_value_len);
                     current_state = STATE_START;
@@ -375,7 +355,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
             case STATE_LIT_NUM:
             // 2)
             // 123...
-                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM", start_ptr, token_value_len);
                 if (is_digit(current_char)) {
                     token_value_len++;
                     i++;
@@ -399,7 +378,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             case STATE_LIT_NUM_FLOAT_E:
                 // 1e..
-                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT_E", start_ptr, token_value_len);
                 if (current_char == '+' || current_char == '-') {
                     token_value_len++;
                     i++;
@@ -419,9 +397,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
             case STATE_LIT_NUM_FLOAT_E_3:
                 // 1e(+-)..
-                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT_E_2", start_ptr, token_value_len);
                 if (is_digit(current_char)) {
-                    printf("tu sme boli\n");
                     i++;
                     token_value_len++;
                     current_state = STATE_LIT_NUM_FLOAT_E_3;
@@ -434,7 +410,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             case STATE_LIT_NUM_FLOAT:
             // 123. ...
-                if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT", start_ptr, token_value_len);
                 if (is_digit(current_char)) {
                     token_value_len++;
                     i++;
@@ -472,7 +447,6 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     }
                 }
 
-                if (DEBUG_LEXER) debug_print_state("STATE_LIT_STR", start_ptr, token_value_len);
                 if (current_char == '$' && source[i-1] != '\\'){
                     current_state = STATE_ERROR;
                 }
@@ -558,23 +532,19 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
 
             case STATE_QUESTION_STRING:
                 if(current_char == 't'){
-                    printf("tu\n");
                     i++;
                     token_value_len++;
                     current_char = source[i];
                     if(current_char == 'r'){
-                        printf("tu\n");
                         i++;
                         token_value_len++;
                         current_char = source[i];
                         if(current_char == 'i'){
-                            printf("tu\n");
                             i++;
                             token_value_len++;
                             current_char = source[i];
                         }
                         if(current_char == 'n'){
-                            printf("tu\n");
                             i++;
                             token_value_len++;
                             current_char = source[i];
@@ -596,15 +566,12 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (i + 1== source_len) {
                     return 0;
                 }
-                printf("i == %d, source_len == %d", i, source_len);
                 return 2;
 
             case STATE_TERMINATE:
             return 0;
             break;
             case STATE_ERROR:
-                if (DEBUG_LEXER) debug_print_state("STATE_ERROR", start_ptr, token_value_len);
-                printf("%d\n", (int) *start_ptr);
                 return 1;
             default:
                 break;
@@ -721,7 +688,6 @@ state state_keyword_main(char c) {
 // get the next token from token_storage
 token_t *get_token(token_storage_t *token_storage){
     if (token_index < token_storage->num_tokens) {
-        if (DEBUG_PARSER) printf("%s\n", token_storage->tokens[token_index]->value);
         return token_storage->tokens[token_index++];
 
     }
