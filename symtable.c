@@ -207,6 +207,15 @@ datatype_t convert_char_to_datatype(char *type) {
     if (strcmp(type, "string") == 0) {
         return TYPE_STRING;
     }
+    if (strcmp(type, "?int") == 0) {
+        return TYPE_OPT_INT;
+    }
+    if (strcmp(type, "?float") == 0) {
+        return TYPE_OPT_FLOAT;
+    }
+    if (strcmp(type, "?string") == 0) {
+        return TYPE_OPT_STRING;
+    }
     return TYPE_VOID;
 }
 
@@ -219,6 +228,15 @@ char *convert_back(datatype_t type) {
     }
     if (type == TYPE_STRING) {
         return "string";
+    }
+    if (type == TYPE_OPT_INT) {
+        return "?int";
+    }
+    if (type == TYPE_OPT_FLOAT) {
+        return "?float";
+    }
+    if (type == TYPE_OPT_STRING) {
+        return "?string";
     }
     return "void";
 }

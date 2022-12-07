@@ -13,13 +13,14 @@ const char *TOK_STR[] = {"TOK_ID", "TOK_ID_FUNCTION", "TOK_KEYWORD", "TOK_SEPARA
 const char whitespace = ' ';
 const char operators[] = {'*', '+', '-', '=', '/', '%', '<', '>', '.'};
 const char *string_operators[] = {"===", "!==", ">=", "<="};
-const char *keywords[] = {"if", "else", "float", "function", "int", "null", "return", "string", "while", "void"}; 
+const char *keywords[] = {"if", "else", "float", "?float", "function", "int", "?int",
+                          "null", "return", "string", "?string", "while", "void", "boolean"};
 const char separators[] = {' ', ':', '(', ')', '{', '}', '[', ']', ';', ',', '\n', '\r'};
 token_t *tokens; 
 const int separ_len = 12;
 const int oper_len = 9;
 const int string_oper_len = 4;
-const int keywords_len = 10;
+const int keywords_len = 14;
 
 int buffer_read_len = 0;
 extern const char *epilog;
@@ -411,8 +412,10 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     i++;
                     token_value_len++;
                     current_state = STATE_LIT_NUM_FLOAT_E_3;
+                    printf("som tu \n");
                 }
                 else {
+                    printf("spadneme sme\n");
                     current_state = STATE_ERROR;
                 }
                 break;
@@ -420,9 +423,10 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 // 1e(+-)..
                 if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT_E_2", start_ptr, token_value_len);
                 if (is_digit(current_char)) {
+                    printf("tu sme boli\n");
                     i++;
                     token_value_len++;
-                    current_state = STATE_LIT_NUM_FLOAT_E_2;
+                    current_state = STATE_LIT_NUM_FLOAT_E_3;
                 }
                 else {
                     current_state = STATE_START;
@@ -430,7 +434,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 break;
 
             case STATE_LIT_NUM_FLOAT:
-            // 123.123...
+            // 123. ...
                 if (DEBUG_LEXER) debug_print_state("STATE_LIT_NUM_FLOAT", start_ptr, token_value_len);
                 if (is_digit(current_char)) {
                     token_value_len++;
@@ -450,6 +454,11 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     token_value_len++;
                     i++;
                     current_state = STATE_LIT_NUM_FLOAT_2;
+                }
+                else if (current_char == 'e' || current_char == 'E') {
+                    token_value_len++;
+                    i++;
+                    current_state = STATE_LIT_NUM_FLOAT_E;
                 }
                 else{
                     //mam cislo, bodku a cislo, a dostal som nieco ine ako
@@ -471,7 +480,7 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                 if (current_char == '$' && source[i-1] != '\\'){
                     current_state = STATE_ERROR;
                 }
-                else if (current_char == '"') {
+                else if ((current_char == '"' && source[i-1] != '\\') || (current_char == '"' && source[i-1] == '\\' && source[i-2] == '\\')) {
                     token_storage_add(token_storage, TOK_LIT, start_ptr, token_value_len);
                     current_state = STATE_START;
                     i++;
@@ -490,8 +499,124 @@ int dka(char *source, int source_len, token_storage_t *token_storage) {
                     current_state = STATE_EPILOG_2;
                     i++;
                 }
+                else if(current_char == 'i'){
+                    current_state = STATE_QUESTION_INT;
+                    token_value_len++;
+                    i++;
+                }
+                else if(current_char == 'f'){
+                    current_state = STATE_QUESTION_FLOAT;
+                    token_value_len++;
+                    i++;
+                }
+                else if(current_char == 's'){
+                    current_state = STATE_QUESTION_STRING;
+                    token_value_len++;
+                    i++;
+                }
+                else if(current_char == 'v'){
+                    current_state = STATE_QUESTION_VOID;
+                    token_value_len++;
+                    i++;
+                }
                 else {
                     current_state = STATE_ERROR;
+                }
+                break;
+
+            case STATE_QUESTION_INT:
+                if(current_char == 'n'){
+                    i++;
+                    token_value_len++;
+                    current_char = source[i];
+                    if(current_char == 't'){
+                        token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
+                        i++;
+                        current_state = STATE_START;
+                    }
+                    else{
+                        return 1;
+                    }
+                }
+                break;
+            case STATE_QUESTION_FLOAT:
+                if(current_char == 'l'){
+                    i++;
+                    token_value_len++;
+                    current_char = source[i];
+                    if(current_char == 'o'){
+                        i++;
+                        token_value_len++;
+                        current_char = source[i];
+                        if(current_char == 'a'){
+                            i++;
+                            token_value_len++;
+                            current_char = source[i];
+                        }
+                        if(current_char == 't'){
+                            token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
+                            i++;
+                            current_state = STATE_START;
+                        }
+                    }
+                }
+                else {
+                    return 1;
+                }
+                break;
+
+            case STATE_QUESTION_STRING:
+                if(current_char == 't'){
+                    printf("tu\n");
+                    i++;
+                    token_value_len++;
+                    current_char = source[i];
+                    if(current_char == 'r'){
+                        printf("tu\n");
+                        i++;
+                        token_value_len++;
+                        current_char = source[i];
+                        if(current_char == 'i'){
+                            printf("tu\n");
+                            i++;
+                            token_value_len++;
+                            current_char = source[i];
+                        }
+                        if(current_char == 'n'){
+                            printf("tu\n");
+                            i++;
+                            token_value_len++;
+                            current_char = source[i];
+                            if (current_char == 'g'){
+                                token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
+                                i++;
+                                current_state = STATE_START;
+                            }
+                        }
+                    }
+                }
+                else{
+                    return 1;
+                }
+                break;
+            case STATE_QUESTION_VOID:
+                if(current_char == 'o'){
+                    i++;
+                    token_value_len++;
+                    current_char = source[i];
+                    if(current_char == 'i'){
+                        i++;
+                        token_value_len++;
+                        current_char = source[i];
+                        if(current_char == 'd'){
+                            token_storage_add(token_storage, TOK_KEYWORD, start_ptr, token_value_len);
+                            i++;
+                            current_state = STATE_START;
+                        }
+                    }
+                }
+                else{
+                    return 1;
                 }
                 break;
 
