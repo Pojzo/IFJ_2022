@@ -1,15 +1,8 @@
 <?php
 declare(strict_types=1);
-<<<<<<< Updated upstream
-$x = 1.7976931348623157E+308;
-=======
-
-function bratislava() : void  {
-
+if(1+2){
+    $x = 5;
 }
-
-$d = "hovno";
-$x = $d;
-
-bratislava($d);
->>>>>>> Stashed changes
+else{
+    $x = 6;
+}

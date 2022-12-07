@@ -390,13 +390,17 @@ bool rule_st(token_storage_t *token_storage) {
     if (term_if(token_storage)) {
         if (term_open_bracket(token_storage) && rule_expr(token_storage) && term_close_bracket(token_storage)
         && term_open_curly_bracket(token_storage) && rule_fstlist(token_storage)) {
+            printf("%s---------\n", token->value);
+            token = get_token_keep(token_storage);
             if (token != NULL && token->token_type == TOK_KEYWORD && strcmp(token->value, "else") == 0) {
                 get_token(token_storage);
                 if (rule_else(token_storage)) {
+                    printf("sme tu\n");
                     return 1;      
                 }
             } 
             else {
+                printf("nie sme tu\n");
                 return 1;
             }
          
